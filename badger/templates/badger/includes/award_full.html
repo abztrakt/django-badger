@@ -1,0 +1,37 @@
+{% load badger_tags %}
+
+<dl class="award">
+    <dt>Awarded to:</dt>
+    <dd class="awarded_to"><a href="{{ award.user.get_absolute_url }}"
+           class="username">{{ award.user }}</a></dd>
+    {% if award.description %}
+        <dt>Explanation:</dt>
+            <dd class="description">{{ award.description }}</dd>
+    {% endif %}
+    {% if award.nomination %}
+        <dt>Nominated by:</dt>
+            <dd class="nominated_by"><a href="{{ award.nomination.creator.get_absolute_url }}" 
+                class="username">{{ award.nomination.creator }}</a></dd>
+        <dt>Nomination approved by:</dt>
+        {% if award.badge.nominations_autoapproved %}
+            <dd class="nomination_approved_by"><span class="autoapproved">(auto-approved)</span></dd>
+        {% elif award.nomination.approver %}
+            <dd class="nomination_approved_by"><a href="{{ award.nomination.approver.get_absolute_url }}" 
+                class="username">{{ award.nomination.approver }}</a></dd>
+        {% endif %}
+    {% else %}
+        <dt>Awarded by:</dt>
+            <dd><a href="{{ award.creator.get_absolute_url }}" 
+                class="username">{{ award.creator }}</a></dd>
+    {% endif %}
+    <dt>Issued on:</dt>
+        <dd>{{ award.created }}</dd>
+</dl>
+{% if award|permissions_for:request.user|key:'delete_by' %}
+<dl class="actions">
+    <dt>Actions:</dt>
+    <dd><ul class="btn-list">
+        <li><a class="btn btn-large btn-danger delete_award" href="{% url badger.views.award_delete badge.slug award.id %}">{{ _('Delete award') }}</a></li>
+    </ul></dd>
+</dl>
+{% endif %}
