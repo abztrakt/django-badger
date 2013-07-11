@@ -30,7 +30,7 @@
             <dd class="description">{{ badge.description }}</dd>
     {% endif %}
     <dt>Creator:</dt>
-        <dd><a href="{{ badge.creator.get_absolute_url }}">{{ badge.creator }}</a></dd>
+        <dd><a href="/people/{{ badge.creator}}">{{ badge.creator }}</a></dd>
     <dt>Created:</dt>
         <dd>{{ badge.created }}</dd>
     <dt>Modified:</dt>
