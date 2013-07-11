@@ -326,8 +326,6 @@ class BadgeManager(models.Manager, SearchManagerMixin):
     search_fields = ('title', 'slug', 'description', )
 
     def allows_add_by(self, user):
-        if user.is_authenticated():
-            return False
         if getattr(settings, "BADGER_ALLOW_ADD_BY_ANYONE", False):
             return True
         if user.has_perm('badger.add_badge'):
@@ -335,8 +333,6 @@ class BadgeManager(models.Manager, SearchManagerMixin):
         return False
 
     def allows_grant_by(self, user):
-        if user.is_authenticated():
-            return False
         if user.has_perm('badger.grant_deferredaward'):
             return True
         return False
