@@ -157,7 +157,7 @@ class BadgeEditForm(MyModelForm):
             fields += ('tags',)
         except ImportError, e:
             pass
-        fields += ('unique', 'nominations_accepted',
+        fields += ('unique', 'prerequisites', 'nominations_accepted',
                    'nominations_autoapproved',)
 
     required_css_class = "required"
