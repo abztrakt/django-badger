@@ -20,7 +20,7 @@
     </header>
 
     <form id="nominate_badge" method="POST" action="" enctype="multipart/form-data">
-        {{ csrf }}
+        {% csrf_token %}
         {% if awards_count %}
             <p>{% blocktrans with badge_url=badge.get_absolute_url awards_count=awards_count %}
                 <span class="label label-warning">Note:</span>
