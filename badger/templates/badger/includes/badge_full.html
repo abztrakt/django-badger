@@ -30,7 +30,11 @@
             <dd class="description">{{ badge.description }}</dd>
     {% endif %}
     <dt>Creator:</dt>
-        <dd><a href="/people/{{ badge.creator}}">{{ badge.creator }}</a></dd>
+        {% if badge.creator %}
+            <dd><a href="/people/{{ badge.creator}}">{{ badge.creator }}</a></dd>
+        {% else %}
+            <dd>{{ badge.creator }}</dd>
+        {% endif %}
     <dt>Created:</dt>
         <dd>{{ badge.created }}</dd>
     <dt>Modified:</dt>
