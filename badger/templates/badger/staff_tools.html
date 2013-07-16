@@ -11,7 +11,7 @@
         <h2>Grant multiple claim codes</h2>
     </header>
     <form id="grant_multiple" method="POST" action="" enctype="multipart/form-data">
-        {{ csrf }}
+        {% csrf_token %}
         <input type="hidden" name="is_grant" value="1" />
         <ul>
             {{ grant_form.as_ul }}

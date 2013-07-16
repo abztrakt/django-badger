@@ -39,7 +39,7 @@
         {% if deferred_award|permissions_for:request.user|key:'grant_by' %}
             <form id="grant_award" method="POST" action="">
                 <input type="hidden" name="is_grant" value="1" />
-                {{ csrf }}
+                {% csrf_token %}
                 <h3>{{ _("Grant") }}</h3>
                 <p>{{ _("You can grant this award to someone else") }}
                 {{ grant_form.as_p }}
@@ -49,7 +49,7 @@
 
         {% if deferred_award|permissions_for:request.user|key:'claim_by' %}
         <form id="claim_award" method="POST" action="" class="{% if deferred_award.email and request.user.email != deferred_award.email %}email-mismatch{% endif %}">
-            {{ csrf }}
+            {% csrf_token %}
             <h3>{{ _("Claim") }}</h3>
             {% if deferred_award.email and request.user.email != deferred_award.email %}
                 {# This isn't enforced, since an awardee might have multiple email addresses #}
