@@ -110,16 +110,16 @@ class MultiEmailField(MultipleItemsField):
         validate_email(item)
 
 
-class BadgeAwardForm(MyForm):
+class BadgeAwardForm(MyModelForm):
     """Form to create either a real or deferred badge award"""
     # TODO: Needs a captcha?
-    emails = MultiEmailField(max_items=10,
-            help_text="Enter up to 10 email addresses for badge award "
-                      "recipients")
-    description = CharField(
-            label='Explanation',
-            widget=Textarea, required=False,
-            help_text="Explain why this badge should be awarded")
+    class Meta:
+        model = Award
+        fields = ('description', 'user',)
+    
+    def __init__(self, *args, **kwargs):
+        super(BadgeAwardForm, self).__init__(*args, **kwargs)
+
 
 
 class DeferredAwardGrantForm(MyForm):

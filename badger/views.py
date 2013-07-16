@@ -221,21 +221,20 @@ def award_badge(request, slug):
         return HttpResponseForbidden('Award forbidden')
 
     if request.method != "POST":
-        form = BadgeAwardForm()
+        form = BadgeAwardForm(instance=badge)
     else:
         form = BadgeAwardForm(request.POST, request.FILES)
         if form.is_valid():
-            emails = form.cleaned_data['emails']
-            description = form.cleaned_data['description']
-            for email in emails:
-                result = badge.award_to(email=email, awarder=request.user,
-                                        description=description)
-                if result:
-                    if not hasattr(result, 'claim_code'):
-                        messages.info(request, _('Award issued to %s') % email)
-                    else:
-                        messages.info(request, _('Invitation to claim award '
-                                                 'sent to %s') % email)
+            try:
+                new_sub = form.save(commit=False)
+                new_sub.creator=request.user
+                new_sub.badge=badge
+                new_sub.save()
+                form.save_m2m()
+            except BadgeAlreadyAwardedException:
+                msg = "The badge "+badge.title +" has already been awarded to " + new_sub.user.username
+                return render_to_response('%s/fail.html' %bsettings.TEMPLATE_BASE, dict(request=request, message=msg), context_instance=RequestContext(request))
+            
             return HttpResponseRedirect(reverse('badger.views.detail', 
                                                 args=(badge.slug,)))
 
