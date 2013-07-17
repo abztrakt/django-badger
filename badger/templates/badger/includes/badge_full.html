@@ -1,22 +1,5 @@
 {% load badger_tags %}
 
-{% if not award %}
-<ul class="btn-list">
-    {% if perms.badger.edit_badge %}
-        <li><a class="btn btn-large btn-primary edit_badge" href="{% url badger.views.edit badge.slug  %}">{{ _('Edit badge') }}</a></li>
-    {% endif %}
-    {% if perms.badger.delete_badge %}
-        <li><a class="btn btn-large btn-danger delete_badge" href="{% url badger.views.delete badge.slug %}">{{ _('Delete badge') }}</a></li>
-    {% endif %}
-    {% if perms.badger.add_award %}
-        <li><a class="btn btn-large btn-primary award_badge" href="{% url badger.views.award_badge badge.slug %}">{{ _('Award badge') }}</a></li>
-    {% endif %}
-    {% if perms.badger.add_nomination %}
-        <li><a class="btn btn-large btn-danger nominate_badge" href="{% url badger.views.nominate_for badge.slug %}">{{ _('Nominate badge') }}</a></li>
-    {% endif %}
-
-</ul>
-{% endif %}
 
 <dl class="badge" data-slug="{{ badge.slug }}">
 
@@ -47,8 +30,19 @@
     <dt>Modified:</dt>
         <dd>{{ badge.modified }}</dd>
     <dt>Actions:</dt>
-    <dd><ul>
-        {% user_award_list badge request.user %}
+    <dd><ul class="btn-list">
+        {% if perms.badger.edit_badge %}
+            <li><a class="btn btn-primary edit_badge" href="{% url badger.views.edit badge.slug  %}">{{ _('Edit badge') }}</a></li>
+        {% endif %}
+        {% if perms.badger.delete_badge %}
+            <li><a class="btn btn-danger delete_badge" href="{% url badger.views.delete badge.slug %}">{{ _('Delete badge') }}</a></li>
+        {% endif %}
+        {% if perms.badger.add_award %}
+            <li><a class="btn btn-primary award_badge" href="{% url badger.views.award_badge badge.slug %}">{{ _('Award badge') }}</a></li>
+        {% endif %}
+        {% if perms.badger.add_nomination %}
+            <li><a class="btn btn-danger nominate_badge" href="{% url badger.views.nominate_for badge.slug %}">{{ _('Nominate badge') }}</a></li>
+        {% endif %}
 
     </ul></dd>
 </dl>
