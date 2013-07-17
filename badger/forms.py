@@ -190,8 +190,12 @@ class BadgeNewForm(BadgeEditForm):
         super(BadgeNewForm, self).__init__(*args, **kwargs)
 
 
-class BadgeSubmitNominationForm(MyForm):
+class BadgeSubmitNominationForm(MyModelForm):
     """Form to submit badge nominations"""
-    emails = MultiEmailField(max_items=10,
-            help_text="Enter up to 10 email addresses for badge award "
-                      "nominees")
+    class Meta:
+        model = Nomination
+        fields = ('nominee',)
+    
+    def __init__(self, *args, **kwargs):
+        super(BadgeSubmitNominationForm, self).__init__(*args, **kwargs)
+

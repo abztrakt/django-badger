@@ -504,26 +504,20 @@ def nominate_for(request, slug):
     else:
         form = BadgeSubmitNominationForm(request.POST, request.FILES)
         if form.is_valid():
-            emails = form.cleaned_data['emails']
-            for email in emails:
-                users = User.objects.filter(email=email)
-                if not users:
-                    # TODO: Need a deferred nomination mechanism for
-                    # non-registered users.
-                    pass
+            try:
+                new_sub = form.save(commit=False)
+                if badge.nominations_autoapproved:
+                    award=Award(badge=badge,user=new_sub.nominee,creator=request.user) 
+                    award.save()
                 else:
-                    nominee = users[0]
-                    try:
-                        award = badge.nominate_for(nominee, request.user)
-                        messages.info(request,
-                            _('Nomination submitted for %s') % email)
-                    except BadgeAlreadyAwardedException, e:
-                        messages.info(request,
-                            _('Badge already awarded to %s') % email)
-                    except Exception, e:
-                        messages.info(request,
-                            _('Nomination failed for %s') % email)
-
+                    new_sub.creator=request.user
+                    new_sub.badge=badge
+                    new_sub.save()
+                    form.save_m2m()
+            except BadgeAlreadyAwardedException:
+                msg = "The badge "+badge.title +" has already been awarded to " + new_sub.nominee.username
+                return render_to_response('%s/fail.html' %bsettings.TEMPLATE_BASE, dict(request=request, message=msg), context_instance=RequestContext(request))
+ 
             return HttpResponseRedirect(reverse('badger.views.detail',
                                                 args=(badge.slug,)))
 
