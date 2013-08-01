@@ -29,6 +29,14 @@
         <dd>{{ badge.created }}</dd>
     <dt>Modified:</dt>
         <dd>{{ badge.modified }}</dd>
+    <dt>Prerequisites:</dt>
+        {% if prerequisites %}
+            {% for prereq in prerequisites %}
+                <dd><a href="/badger/badge/{{ prereq.slug }}">{{ prereq.slug }}</a></dd>
+            {% endfor %}
+        {% else %}
+            <dd> None </dd>
+        {% endif %}
     <dt>Actions:</dt>
     <dd><ul class="btn-list">
         {% if perms.badger.edit_badge %}

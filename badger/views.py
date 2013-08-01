@@ -130,7 +130,7 @@ def detail(request, slug, format="html"):
         return HttpResponseRedirect(url)
 
     claim_groups = badge.claim_groups
-
+    prerequisites = badge.prerequisites.all()
     if format == 'json':
         data = badge.as_obi_serialization(request)
         resp = HttpResponse(simplejson.dumps(data))
@@ -138,7 +138,7 @@ def detail(request, slug, format="html"):
         return resp
     else:
         return render_to_response('%s/badge_detail.html' % bsettings.TEMPLATE_BASE, dict(
-            request=request, badge=badge, award_list=awards, sections=sections,
+            prerequisites=prerequisites, request=request, badge=badge, award_list=awards, sections=sections,
             claim_groups=claim_groups
         ), context_instance=RequestContext(request))
 
