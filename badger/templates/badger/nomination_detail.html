@@ -1,5 +1,6 @@
 {% extends "badger/base.html" %}
 
+{% load badger_tags %}
 {% block pageid %}nomination_detail{% endblock %}
 
 {% block content %}
@@ -7,7 +8,7 @@
 
     <section class="badge span4">
         <header class="page-header">
-            <h2>{{ _("Badge: {badge_title}") | f(badge_title=badge.title) }}</h2>
+            <h2>Badge: {{ badge.title }}</h2>
         </header>
         {% include "badger/includes/badge_full.html" %}
     </section>
@@ -17,21 +18,17 @@
             <h2>{{ _("Nomination detail") }}</h2>
         </header>
         <dl class="nomination">
-            {% set show_approve = not nomination.is_approved and nomination.allows_approve_by(request.user) %}
-            {% set show_accept = nomination.is_approved and not nomination.is_accepted and nomination.allows_accept(request.user) %}
-            {% set show_reject = nomination.allows_reject_by(request.user) %}
-            {% if show_approve or show_accept %}
                 <dt>{{ _("Actions:") }}</dt><dd><ul class="btn-list">
                     {% if show_approve %}
                     <li><form method="POST">
-                            {{ csrf() }}
+                            {% csrf_token %}
                             <input type="hidden" name="action" value="approve_by" />
                             <button class="btn btn-large btn-primary">{{ _('Approve nomination') }}</button>
                         </form></li>
                     {% endif %}
-                    {% if show_accept %}
+                    {% if show_accept %} 
                         <li><form method="POST">
-                            {{ csrf() }}
+                            {% csrf_token %}
                             <input type="hidden" name="action" value="accept" />
                             <button class="btn btn-large btn-primary">
                                 {% if request.user == nomination.user %}
@@ -44,33 +41,32 @@
                     {% endif %}
                     {% if show_approve %}
                     <li><form method="POST">
-                            {{ csrf() }}
+                            {% csrf_token %}
                             <input type="hidden" name="action" value="reject_by" />
                             <button class="btn btn-large btn-danger">{{ _('Reject nomination') }}</button>
                         </form></li>
                     {% endif %}
                 </ul></dd>
-            {% endif %}
             {% if nomination.award %}
                 <dt>{{ _("Award:") }}</dt>
-                    <dd><a href="{{ nomination.award.get_absolute_url() }}">{{ nomination.award }}</a></dd>
+                    <dd><a href="{{ award.nominee }}">{{ nomination.award }}</a></dd>
             {% endif %}
             <dt>{{ _("Nominee:") }}</dt>
-                <dd><a href="{{ nomination.nominee.get_absolute_url() }}"><img src="{{ user_avatar(nomination.nominee) }}" class="avatar" alt="{{ nomination.nominee }}" width="24" height="24" />{{ nomination.nominee }}</a></dd>
+                <dd><a href="/people/{{ nomination.nominee.username }}"><img src="{% user_avatar nomination.nominee %}" class="avatar" alt="{{ nomination.nominee }}" width="24" height="24" />{{ nomination.nominee }}</a></dd>
             <dt>{{ _("Accepted?:") }}</dt>
-                <dd>{{ nomination.accepted and _("Yes") or _("No") }}</dd>
+                <dd>{{ nomination.accepted }}</dd>
             <dt>{{ _("Nominator:") }}</dt>
-                <dd><a href="{{ nomination.creator.get_absolute_url() }}"><img src="{{ user_avatar(nomination.creator) }}" class="avatar" alt="{{ nomination.creator }}" width="24" height="24" />{{ nomination.creator }}</a></dd>
+                <dd><a href="/people/{{ nomination.creator.username }}"><img src="{% user_avatar nomination.creator %}" class="avatar" alt="{{ nomination.creator }}" width="24" height="24" />{{ nomination.creator }}</a></dd>
             {% if nomination.approver %}
                 <dt>{{ _("Approver:") }}</dt>
-                    <dd><a href="{{ nomination.approver.get_absolute_url() }}"><img src="{{ user_avatar(nomination.approver) }}" class="avatar" alt="{{ nomination.approver }}" width="24" height="24" />{{ nomination.approver }}</a></dd>
+                    <dd><a href="/people/{{ nomination.approver.username }}"><img src="{% user_avatar nomination.approver %}" class="avatar" alt="{{ nomination.approver }}" width="24" height="24" />{{ nomination.approver }}</a></dd>
             {% else %}
                 <dt>{{ _("Approved?:") }}</dt>
                     <dd>{{ _("No") }}</dd>
             {% endif %}
             {% if nomination.rejected_by %}
                 <dt>{{ _("Rejected by:") }}</dt>
-                    <dd><a href="{{ nomination.rejected_by.get_absolute_url() }}"><img src="{{ user_avatar(nomination.rejected_by) }}" class="avatar" alt="{{ nomination.rejected_by }}" width="24" height="24" />{{ nomination.rejected_by }}</a></dd>
+                    <dd><a href="/people/{{ nomination.rejected_by.username }}"><img src="{% user_avatar nomination.rejected_by %}" class="avatar" alt="{{ nomination.rejected_by }}" width="24" height="24" />{{ nomination.rejected_by }}</a></dd>
                 {% if nomination.rejected_reason %}
                     <dt>{{ _("Rejected reason:") }}</dt>
                     <dd>{{ nomination.rejected_reason }}</dd>

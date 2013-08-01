@@ -485,9 +485,10 @@ def nomination_detail(request, slug, id, format="html"):
         return HttpResponseRedirect(reverse(
                 'badger.views.nomination_detail',
                 args=(slug, id)))
-
+    show_approve = not nomination.is_approved and nomination.allows_approve_by(request.user) 
+    show_accept = nomination.is_approved and not nomination.is_accepted and nomination.allows_accept(request.user)
     return render_to_response('%s/nomination_detail.html' % bsettings.TEMPLATE_BASE,
-                              dict(request=request, badge=badge, nomination=nomination,),
+                              dict(show_approve=show_approve, show_accept=show_accept, request=request, badge=badge, nomination=nomination,),
                               context_instance=RequestContext(request))
 
 
