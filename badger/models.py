@@ -304,10 +304,14 @@ class SearchManagerMixin(object):
 class BadgerException(Exception):
     """General Badger model exception"""
 
-
 class BadgeException(BadgerException):
     """Badge model exception"""
 
+class BadgeRetiredException(BadgerException):
+    """Attempt to award a retired badge"""
+
+class BadgePrerequisitesNotFullfilledException(BadgeException):
+    """Attempt to award a badge without prerequisites completed not allowed."""
 
 class BadgeAwardNotAllowedException(BadgeException):
     """Attempt to award a badge not allowed."""
@@ -390,6 +394,8 @@ class Badge(models.Model):
     unique = models.BooleanField(default=True,
             help_text="Should awards of this badge be limited to "
                       "one-per-person?")
+    retired = models.BooleanField(default=True, blank=True,
+            help_text="Should this badge no longer be available to be awarded?")
 
     nominations_accepted = models.BooleanField(default=True, blank=True,
             help_text="Should this badge accept nominations from " 
@@ -547,18 +553,18 @@ class Badge(models.Model):
                                     creator=awarder,
                                     description=description)
 
-    def check_prerequisites(self, awardee, dep_badge, award):
+    def check_prerequisites(self, awardee):
         """Check the prerequisites for this badge. If they're all met, award
         this badge to the user."""
         if self.is_awarded_to(awardee):
             # Not unique, but badge auto-award from prerequisites should only
             # happen once.
-            return None
+            return False
         for badge in self.prerequisites.all():
             if not badge.is_awarded_to(awardee):
                 # Bail on the first unmet prerequisites
-                return None
-        return self.award_to(awardee)
+                return False
+        return True
 
     def is_awarded_to(self, user):
         """Has this badge been awarded to the user?"""
@@ -711,7 +717,10 @@ class Award(models.Model):
             # Bail if this is an attempt to double-award a unique badge
             if self.badge.unique and self.badge.is_awarded_to(self.user):
                 raise BadgeAlreadyAwardedException()
-
+            if not self.badge.check_prerequisites(self.user):
+                raise BadgePrerequisitesNotFullfilledException()
+            if not self.badge.retired:
+                raise BadgeRetiredException()
             # Only fire will-be-awarded signal on a new award.
             badge_will_be_awarded.send(sender=self.__class__, award=self)
 
@@ -736,12 +745,22 @@ class Award(models.Model):
 
             # Since this badge was just awarded, check the prerequisites on all
             # badges that count this as one.
-            for dep_badge in self.badge.badge_set.all():
-                dep_badge.check_prerequisites(self.user, self.badge, self)
-
+            for badge in self.badge.badge_set.all():
+                prog=Progress.objects.filter(user=self.user, badge=badge)
+                if not badge.check_prerequisites(self.user):
+                    count=badge.prerequisites.all().count()
+                    #if no progress has been made, create a new one
+                    if not prog: 
+                        Progress.objects.create(user=self.user, badge=badge, percent=100.0/count)
+                    else:
+                        for progress in prog:
+                            #if badge's prereqs are met, award it. if not, update percent
+                            progress.percent += 100.0/count
+                            progress.save()
+                else:
+                   badge.award_to(self.user)
+                   prog.delete() 
             # Reset any progress for this user & badge upon award.
-            Progress.objects.filter(user=self.user, badge=self.badge).delete()
-
     def delete(self):
         """Make sure nominations get deleted along with awards"""
         Nomination.objects.filter(award=self).delete()
