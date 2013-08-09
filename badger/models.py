@@ -400,7 +400,7 @@ class Badge(models.Model):
     nominations_accepted = models.BooleanField(default=True, blank=True,
             help_text="Should this badge accept nominations from " 
                       "other users?")
-
+    criteria_url = models.URLField(blank=True, help_text="a url for the criteria to obtain this badge")
     nominations_autoapproved = models.BooleanField(default=False, blank=True,
             help_text="Should all nominations be automatically approved?")
 
