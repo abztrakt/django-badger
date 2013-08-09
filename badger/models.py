@@ -1109,6 +1109,11 @@ class Nomination(models.Model):
     objects = NominationManager()
 
     badge = models.ForeignKey(Badge)
+    description = models.TextField(blank=True,
+            help_text="A description of why the nominee is being nominated")
+    evidence = models.TextField(blank=True,
+            help_text="Any direct evidence showing why the nominee deserves this badge")
+  
     nominee = models.ForeignKey(User, related_name="nomination_nominee",
             blank=False, null=False)
     accepted = models.BooleanField(default=False)
