@@ -133,6 +133,8 @@ def detail(request, slug, format="html"):
     claim_groups = badge.claim_groups
     prerequisites = badge.prerequisites.all()
     retire = badge.allows_retire(request.user)
+    nominations = Nomination.objects.filter(badge=badge)
+
     if format == 'json':
         data = badge.as_obi_serialization(request)
         resp = HttpResponse(simplejson.dumps(data))
@@ -140,7 +142,7 @@ def detail(request, slug, format="html"):
         return resp
     else:
         return render_to_response('%s/badge_detail.html' % bsettings.TEMPLATE_BASE, dict(
-            prerequisites=prerequisites, retire=retire, request=request, badge=badge, award_list=awards, sections=sections,
+            nominations=nominations, prerequisites=prerequisites, retire=retire, request=request, badge=badge, award_list=awards, sections=sections,
             claim_groups=claim_groups
         ), context_instance=RequestContext(request))
 
@@ -187,6 +189,20 @@ def edit(request, slug):
             new_sub = form.save(commit=False)
             new_sub.save()
             form.save_m2m()
+            if count !=badge.prerequisites.count():
+                progresses=Progress.objects.filter(badge=badge)
+                for prog in progresses:
+                    if not badge.check_prerequisites(prog.user):
+                        prog.percent =0.0
+                        count=badge.prerequisites.count()
+                        for prereq in prog.badge.prerequisites.all():
+                            if Award.objects.filter(badge=prereq, user=prog.user):
+                                prog.percent += 100.0/count
+                        prog.save()
+                    else:
+                        badge.award_to(prog.user)
+                        prog.delete()
+  
             return HttpResponseRedirect(reverse(
                     'badger.views.detail', args=(new_sub.slug,)))
 
@@ -519,9 +535,9 @@ def nomination_detail(request, slug, id, format="html"):
     """Show details on a nomination, provide for approval and acceptance"""
     badge = get_object_or_404(Badge, slug=slug)
     nomination = get_object_or_404(Nomination, badge=badge, pk=id)
+    prerequisites=badge.prerequisites.all()
     if not nomination.allows_detail_by(request.user):
         return HttpResponseForbidden()
-
     if request.method == "POST":
         action = request.POST.get('action', '')
         if action == 'approve_by':
@@ -536,7 +552,7 @@ def nomination_detail(request, slug, id, format="html"):
     show_approve = not nomination.is_approved and nomination.allows_approve_by(request.user) 
     show_accept = nomination.is_approved and not nomination.is_accepted and nomination.allows_accept(request.user)
     return render_to_response('%s/nomination_detail.html' % bsettings.TEMPLATE_BASE,
-                              dict(show_approve=show_approve, show_accept=show_accept, request=request, badge=badge, nomination=nomination,),
+                              dict(prerequisites=prerequisites, show_approve=show_approve, show_accept=show_accept, request=request, badge=badge, nomination=nomination,),
                               context_instance=RequestContext(request))
 
 

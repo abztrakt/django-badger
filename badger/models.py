@@ -522,7 +522,7 @@ class Badge(models.Model):
         """Produce a list of claim group IDs available"""
         return DeferredAward.objects.get_claim_groups(badge=self)
 
-    def award_to(self, awardee=None, email=None, awarder=None,
+    def award_to(self, awardee=None, awarder=None,
                  description='', raise_already_awarded=False):
         """Award this badge to the awardee on the awarder's behalf"""
         # If no awarder given, assume this is on the badge creator's behalf.
@@ -531,24 +531,6 @@ class Badge(models.Model):
 
         if not self.allows_award_to(awarder):
             raise BadgeAwardNotAllowedException()
-
-        # If we have an email, but no awardee, try looking up the user.
-        if email and not awardee:
-            qs = User.objects.filter(email=email)
-            if not qs:
-                # If there's no user for this email address, create a
-                # DeferredAward for future claiming.
-
-                if self.unique and DeferredAward.objects.filter(
-                    badge=self, email=email).exists():
-                    raise BadgeAlreadyAwardedException()
-
-                da = DeferredAward(badge=self, email=email)
-                da.save()
-                return da
-
-            # Otherwise, we'll use the most recently created user
-            awardee = qs.latest('date_joined')
 
         if self.unique and self.is_awarded_to(awardee):
             if raise_already_awarded:
@@ -1152,7 +1134,6 @@ class Nomination(models.Model):
                        args=(self.badge.slug, self.id))
 
     def save(self, *args, **kwargs):
-
         # Signals and some bits of logic only happen on a new nomination.
         is_new = not self.pk
 

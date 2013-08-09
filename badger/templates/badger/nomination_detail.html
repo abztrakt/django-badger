@@ -49,7 +49,7 @@
                 </ul></dd>
             {% if nomination.award %}
                 <dt>{{ _("Award:") }}</dt>
-                    <dd><a href="{{ award.nominee }}">{{ nomination.award }}</a></dd>
+                    <dd><a href="{{ nomination.award.get_absolute_url }}">{{ nomination.award }}</a></dd>
             {% endif %}
             <dt>{{ _("Nominee:") }}</dt>
                 <dd><a href="/people/{{ nomination.nominee.username }}"><img src="{% user_avatar nomination.nominee %}" class="avatar" alt="{{ nomination.nominee }}" width="24" height="24" />{{ nomination.nominee }}</a></dd>
