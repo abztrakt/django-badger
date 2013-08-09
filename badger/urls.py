@@ -57,6 +57,12 @@ urlpatterns = patterns('badger.views',
         name='badger.badge_edit'),
     url(r'^badge/(?P<slug>[^/]+)/delete$', 'delete', 
         name='badger.badge_delete'),
+    url(r'^badge/(?P<slug>[^/]+)/retire$', 'retire', 
+        name='badger.badge_retire'),
+    url(r'^badge/(?P<slug>[^/]+)/unretire$', 'unretire', 
+        name='badger.badge_unretire'),
+
+
     url(r'^badge/(?P<slug>[^/]+)/nominations/(?P<id>\d+)/?$', 'nomination_detail',
         name='badger.nomination_detail'),
     url(r'^users/(?P<username>[^/]+)/badges/?$', 'badges_by_user',

@@ -43,7 +43,8 @@ import badger
 from badger import settings as bsettings
 from .models import (Badge, Award, Nomination, DeferredAward,
                      Progress, BadgeAwardNotAllowedException,
-                     BadgeAlreadyAwardedException,
+                     BadgeAlreadyAwardedException, BadgePrerequisitesNotFullfilledException,
+                     BadgeRetiredException,
                      NominationApproveNotAllowedException,
                      NominationAcceptNotAllowedException)
 from .forms import (BadgeAwardForm, DeferredAwardGrantForm,
@@ -131,6 +132,7 @@ def detail(request, slug, format="html"):
 
     claim_groups = badge.claim_groups
     prerequisites = badge.prerequisites.all()
+    retire = badge.allows_retire(request.user)
     if format == 'json':
         data = badge.as_obi_serialization(request)
         resp = HttpResponse(simplejson.dumps(data))
@@ -138,7 +140,7 @@ def detail(request, slug, format="html"):
         return resp
     else:
         return render_to_response('%s/badge_detail.html' % bsettings.TEMPLATE_BASE, dict(
-            prerequisites=prerequisites, request=request, badge=badge, award_list=awards, sections=sections,
+            prerequisites=prerequisites, retire=retire, request=request, badge=badge, award_list=awards, sections=sections,
             claim_groups=claim_groups
         ), context_instance=RequestContext(request))
 
@@ -173,9 +175,10 @@ def create(request):
 def edit(request, slug):
     """Edit an existing badge"""
     badge = get_object_or_404(Badge, slug=slug)
+    count=badge.prerequisites.count()
     if not badge.allows_edit_by(request.user):
         return HttpResponseForbidden()
-
+    
     if request.method != "POST":
         form = BadgeEditForm(instance=badge)
     else:
@@ -212,6 +215,45 @@ def delete(request, slug):
     ), context_instance=RequestContext(request))
 
 
+def unretire(request, slug):
+    """Delete a badge"""
+    badge = get_object_or_404(Badge, slug=slug)
+    if not badge.allows_delete_by(request.user):
+        return HttpResponseForbidden()
+
+    awards_count = badge.award_set.count()
+
+    if request.method == "POST":
+        messages.info(request, _('Badge "%s" retired.') % badge.title)
+        badge.retired =False
+        badge.save()
+        return HttpResponseRedirect(reverse('badger.views.badges_list'))
+
+    return render_to_response('%s/badge_unretire.html' % bsettings.TEMPLATE_BASE, dict(
+        badge=badge, awards_count=awards_count, request=request
+    ), context_instance=RequestContext(request))
+
+
+
+def retire(request, slug):
+    """Delete a badge"""
+    badge = get_object_or_404(Badge, slug=slug)
+    if not badge.allows_delete_by(request.user):
+        return HttpResponseForbidden()
+
+    awards_count = badge.award_set.count()
+
+    if request.method == "POST":
+        messages.info(request, _('Badge "%s" retired.') % badge.title)
+        badge.retired =True
+        badge.save()
+        return HttpResponseRedirect(reverse('badger.views.badges_list'))
+
+    return render_to_response('%s/badge_retire.html' % bsettings.TEMPLATE_BASE, dict(
+        badge=badge, awards_count=awards_count, request=request
+    ), context_instance=RequestContext(request))
+
+
 @require_http_methods(['GET', 'POST'])
 @login_required
 def award_badge(request, slug):
@@ -232,9 +274,15 @@ def award_badge(request, slug):
                 new_sub.save()
                 form.save_m2m()
             except BadgeAlreadyAwardedException:
-                msg = "The badge "+badge.title +" has already been awarded to " + new_sub.user.username
+                msg = "The badge "+badge.title +" has already been awarded to user " + new_sub.user.username
                 return render_to_response('%s/fail.html' %bsettings.TEMPLATE_BASE, dict(request=request, message=msg), context_instance=RequestContext(request))
-            
+            except BadgePrerequisitesNotFullfilledException:
+                msg = "The badge "+badge.title +" does not have the prerequisites completed for user " + new_sub.user.username
+                return render_to_response('%s/fail.html' %bsettings.TEMPLATE_BASE, dict(request=request, message=msg), context_instance=RequestContext(request))
+            except BadgeRetiredException:
+                msg = "The badge "+badge.title +" has been retired"
+                return render_to_response('%s/fail.html' %bsettings.TEMPLATE_BASE, dict(request=request, message=msg), context_instance=RequestContext(request))
+ 
             return HttpResponseRedirect(reverse('badger.views.detail', 
                                                 args=(badge.slug,)))
 

@@ -394,7 +394,7 @@ class Badge(models.Model):
     unique = models.BooleanField(default=True,
             help_text="Should awards of this badge be limited to "
                       "one-per-person?")
-    retired = models.BooleanField(default=True, blank=True,
+    retired = models.BooleanField(default=False, blank=True,
             help_text="Should this badge no longer be available to be awarded?")
 
     nominations_accepted = models.BooleanField(default=True, blank=True,
@@ -441,7 +441,6 @@ class Badge(models.Model):
         """Save the submission, updating slug and screenshot thumbnails"""
         if not self.slug:
             self.slug = slugify(self.title)
-
         super(Badge, self).save(**kwargs)
         
         if notification:
@@ -475,8 +474,16 @@ class Badge(models.Model):
 
     def allows_award_to(self, user):
         """Is award_to() allowed for this user?"""
-        if None == user:
+        if user.is_staff or user.is_superuser:
             return True
+        if user == self.creator:
+            return True
+        
+        # TODO: List of delegates for whom awarding is allowed
+
+        return False
+    
+    def allows_retire(self, user):
         if user.is_staff or user.is_superuser:
             return True
         if user == self.creator:
@@ -719,7 +726,7 @@ class Award(models.Model):
                 raise BadgeAlreadyAwardedException()
             if not self.badge.check_prerequisites(self.user):
                 raise BadgePrerequisitesNotFullfilledException()
-            if not self.badge.retired:
+            if self.badge.retired:
                 raise BadgeRetiredException()
             # Only fire will-be-awarded signal on a new award.
             badge_will_be_awarded.send(sender=self.__class__, award=self)

@@ -37,6 +37,12 @@
         {% else %}
             <dd> None </dd>
         {% endif %}
+    <dt>Retired:</dt>
+            {% if badge.retired %}
+                <dd> Yes </dd>
+            {% else %}
+                <dd> No </dd>
+            {% endif %}
     <dt>Actions:</dt>
     <dd><ul class="btn-list">
         {% if perms.badger.edit_badge %}
@@ -45,11 +51,18 @@
         {% if perms.badger.delete_badge %}
             <li><a class="btn btn-danger delete_badge" href="{% url badger.views.delete badge.slug %}">{{ _('Delete badge') }}</a></li>
         {% endif %}
-        {% if perms.badger.add_award %}
-            <li><a class="btn btn-primary award_badge" href="{% url badger.views.award_badge badge.slug %}">{{ _('Award badge') }}</a></li>
-        {% endif %}
-        {% if perms.badger.add_nomination %}
-            <li><a class="btn btn-danger nominate_badge" href="{% url badger.views.nominate_for badge.slug %}">{{ _('Nominate badge') }}</a></li>
+        {% if not badge.retired %}
+            {% if perms.badger.add_award %}
+                <li><a class="btn btn-primary award_badge" href="{% url badger.views.award_badge badge.slug %}">{{ _('Award badge') }}</a></li>
+            {% endif %}
+            {% if perms.badger.add_nomination %}
+                <li><a class="btn btn-danger nominate_badge" href="{% url badger.views.nominate_for badge.slug %}">{{ _('Nominate badge') }}</a></li>
+            {% endif %}
+            {% if retire %}
+                <li><a class="btn btn-danger retire_badge" href="{% url badger.views.retire badge.slug %}">{{ _('Retire badge') }}</a></li>
+            {% endif %}
+        {% else %}
+            <li><a class="btn btn-danger unretire_badge" href="{% url badger.views.unretire badge.slug %}">{{ _('Unretire badge') }}</a></li>
         {% endif %}
 
     </ul></dd>
