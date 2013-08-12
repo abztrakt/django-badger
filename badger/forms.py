@@ -194,7 +194,7 @@ class BadgeSubmitNominationForm(MyModelForm):
     """Form to submit badge nominations"""
     class Meta:
         model = Nomination
-        fields = ('nominee',)
+        fields = ('nominee', 'description', 'evidence')
     
     def __init__(self, *args, **kwargs):
         super(BadgeSubmitNominationForm, self).__init__(*args, **kwargs)
