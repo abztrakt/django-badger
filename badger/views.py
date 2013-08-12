@@ -476,6 +476,15 @@ def awards_by_user(request, username):
         request=request, user=user, award_list=awards,
     ), context_instance=RequestContext(request))
 
+@require_GET
+def nominations_by_user(request, username):
+    """Badge awards by user"""
+    user = get_object_or_404(User, username=username)
+    nominations= Nomination.objects.filter(nominee=user)
+    return render_to_response('%s/nominations_by_user.html' % bsettings.TEMPLATE_BASE, dict(
+        request=request, user=user, nominations=nominations,
+    ), context_instance=RequestContext(request))
+
 
 @require_GET
 def awards_by_badge(request, slug):

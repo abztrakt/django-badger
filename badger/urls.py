@@ -67,6 +67,8 @@ urlpatterns = patterns('badger.views',
         name='badger.nomination_detail'),
     url(r'^users/(?P<username>[^/]+)/badges/?$', 'badges_by_user',
         name='badger.badges_by_user'),
+    url(r'^users/(?P<username>[^/]+)/nominations/?$', 'nominations_by_user',
+        name='badger.nominations_by_user'),
 
     url(r'^feeds/(?P<format>[^/]+)/badges/?$', BadgesRecentFeed(), 
         name="badger.feeds.badges_recent"),
