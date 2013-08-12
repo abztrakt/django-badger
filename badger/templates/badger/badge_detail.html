@@ -41,22 +41,36 @@
     
 </section>
 {% endif %}
-
 {% if nominations %}
 <section id="recent_nominations"> 
-    <h2>Nominations</h2>
+    <h2>Nominations for {{ user }}</h2>
     <ul class="clearfix nominations">
         {% for nomination in nominations %}
-            <li class="nomination">
-                <a href="{{ nomination.get_absolute_url }}" class="label">
-                    <span class="badge_title">{{ nomination.badge.title }}</span>
-                    <span class="relation">was nominated for</span>
-                    <span class="user">{{ nomination.nominee }}</span>
-                    <span class="relation">by</span>
-                    <span class="user">{{ nomination.creator }}</span>
-                </a>
- 
-            </li>
+            {% if not nomination.award %}
+                {% if nomination.approver %}
+                    <li class="nomination">
+                        <a href="{{ nomination.get_absolute_url }}" class="label">
+                            <span class="badge_title">{{ nomination.badge.title }}</span>
+                            <span class="relation">was approved for</span>
+                            <span class="user">{{ nomination.nominee }}</span>
+                            <span class="relation">by</span>
+                            <span class="user">{{ nomination.approver }}</span>
+                        </a>
+                    </li>
+
+                {% else %}
+                    <li class="nomination">
+                        <a href="{{ nomination.get_absolute_url }}" class="label">
+                            <span class="badge_title">{{ nomination.badge.title }}</span>
+                            <span class="relation">was nominated for</span>
+                            <span class="user">{{ nomination.nominee }}</span>
+                            <span class="relation">by</span>
+                            <span class="user">{{ nomination.creator }}</span>
+                        </a>
+                    </li>
+                
+                {% endif %} 
+            {% endif %}
         {% endfor %}
     </ul>
 </section>
