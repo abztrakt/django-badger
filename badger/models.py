@@ -542,6 +542,15 @@ class Badge(models.Model):
                                     creator=awarder,
                                     description=description)
 
+    def prerequisites_for_user(self, user):
+        prerequisites={"completed_prereqs":[], "uncompleted_prereqs":[]}
+        for prereq in self.prerequisites.all():
+            if Award.objects.filter(badge=prereq, user=user):
+                prerequisites['completed_prereqs'].append(prereq)
+            else:
+                prerequisites['uncompleted_prereqs'].append(prereq)
+        return prerequisites    
+    
     def check_prerequisites(self, awardee):
         """Check the prerequisites for this badge. If they're all met, award
         this badge to the user."""
@@ -701,7 +710,6 @@ class Award(models.Model):
 
         # Signals and some bits of logic only happen on a new award.
         is_new = not self.pk
-
         if is_new:
             # Bail if this is an attempt to double-award a unique badge
             if self.badge.unique and self.badge.is_awarded_to(self.user):

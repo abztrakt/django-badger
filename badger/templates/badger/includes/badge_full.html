@@ -31,12 +31,25 @@
         <dd>{{ badge.modified }}</dd>
     <dt>Prerequisites:</dt>
         {% if prerequisites %}
-            {% for prereq in prerequisites %}
+            {% for prereq in completed_prereqs %}
+                <dd><i class="icon-ok"></i><a href="/badger/badge/{{ prereq.slug }}">{{ prereq.slug }}</a></dd>
+            {% endfor %}
+            {% for prereq in uncompleted_prereqs %}
                 <dd><a href="/badger/badge/{{ prereq.slug }}">{{ prereq.slug }}</a></dd>
             {% endfor %}
         {% else %}
             <dd> None </dd>
         {% endif %}
+    {% if prerequisites %}
+    <dt> Progress: </dt>
+        {% if user_award %}
+            <dd> You own this badge! </dd>
+        {% elif progress %}
+            <dd> {{ progress.percent }}% </dd>
+        {% else %}
+            <dd> 0% </dd>
+        {% endif %}
+    {% endif %}
     <dt>Retired:</dt>
             {% if badge.retired %}
                 <dd> Yes </dd>

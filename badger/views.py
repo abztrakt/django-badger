@@ -134,7 +134,13 @@ def detail(request, slug, format="html"):
     prerequisites = badge.prerequisites.all()
     retire = badge.allows_retire(request.user)
     nominations = Nomination.objects.filter(badge=badge)
-
+    progress=Progress.objects.filter(user=request.user, badge=badge)
+    if progress:
+        progress=progress[0]
+    user_award=Award.objects.filter(badge=badge, user=request.user)
+    prereqs=badge.prerequisites_for_user(request.user)
+    completed_prereqs = prereqs['completed_prereqs']
+    uncompleted_prereqs =prereqs['uncompleted_prereqs']
     if format == 'json':
         data = badge.as_obi_serialization(request)
         resp = HttpResponse(simplejson.dumps(data))
@@ -142,7 +148,7 @@ def detail(request, slug, format="html"):
         return resp
     else:
         return render_to_response('%s/badge_detail.html' % bsettings.TEMPLATE_BASE, dict(
-            nominations=nominations, prerequisites=prerequisites, retire=retire, request=request, badge=badge, award_list=awards, sections=sections,
+            nominations=nominations, progress=progress, user_award=user_award, prerequisites=prerequisites, completed_prereqs=completed_prereqs, uncompleted_prereqs=uncompleted_prereqs, retire=retire, request=request, badge=badge, award_list=awards, sections=sections,
             claim_groups=claim_groups
         ), context_instance=RequestContext(request))
 
@@ -177,7 +183,6 @@ def create(request):
 def edit(request, slug):
     """Edit an existing badge"""
     badge = get_object_or_404(Badge, slug=slug)
-    count=badge.prerequisites.count()
     if not badge.allows_edit_by(request.user):
         return HttpResponseForbidden()
     
@@ -189,19 +194,18 @@ def edit(request, slug):
             new_sub = form.save(commit=False)
             new_sub.save()
             form.save_m2m()
-            if count !=badge.prerequisites.count():
-                progresses=Progress.objects.filter(badge=badge)
-                for prog in progresses:
-                    if not badge.check_prerequisites(prog.user):
-                        prog.percent =0.0
-                        count=badge.prerequisites.count()
-                        for prereq in prog.badge.prerequisites.all():
-                            if Award.objects.filter(badge=prereq, user=prog.user):
-                                prog.percent += 100.0/count
-                        prog.save()
-                    else:
-                        badge.award_to(prog.user)
-                        prog.delete()
+            progresses=Progress.objects.filter(badge=badge)
+            for prog in progresses:
+                if not badge.check_prerequisites(prog.user):
+                    prog.percent =0.0
+                    count=badge.prerequisites.count()
+                    for prereq in prog.badge.prerequisites.all():
+                        if Award.objects.filter(badge=prereq, user=prog.user):
+                            prog.percent += 100.0/count
+                    prog.save()
+                else:
+                    badge.award_to(prog.user)
+                    prog.delete()
   
             return HttpResponseRedirect(reverse(
                     'badger.views.detail', args=(new_sub.slug,)))
@@ -220,14 +224,23 @@ def delete(request, slug):
         return HttpResponseForbidden()
 
     awards_count = badge.award_set.count()
-
+    prerequisites=badge.prerequisites.all()
+    progress=Progress.objects.filter(user=request.user, badge=badge)
+    if progress:
+        progress=progress[0]
+    user_award=Award.objects.filter(badge=badge, user=request.user)
+ 
+    prereqs=badge.prerequisites_for_user(request.user)
+    completed_prereqs = prereqs['completed_prereqs']
+    uncompleted_prereqs =prereqs['uncompleted_prereqs']
+ 
     if request.method == "POST":
         messages.info(request, _('Badge "%s" deleted.') % badge.title)
         badge.delete()
         return HttpResponseRedirect(reverse('badger.views.badges_list'))
 
     return render_to_response('%s/badge_delete.html' % bsettings.TEMPLATE_BASE, dict(
-        badge=badge, awards_count=awards_count, request=request
+        progress=progress, user_award=user_award, badge=badge, prerequisites=prerequisites, completed_prereqs=completed_prereqs, uncompleted_prereqs=uncompleted_prereqs, awards_count=awards_count, request=request
     ), context_instance=RequestContext(request))
 
 
@@ -238,7 +251,16 @@ def unretire(request, slug):
         return HttpResponseForbidden()
 
     awards_count = badge.award_set.count()
-
+    prerequisites=badge.prerequisites.all()
+    progress=Progress.objects.filter(user=request.user, badge=badge)
+    if progress:
+        progress=progress[0]
+    user_award=Award.objects.filter(badge=badge, user=request.user)
+ 
+    prereqs=badge.prerequisites_for_user(request.user)
+    completed_prereqs = prereqs['completed_prereqs']
+    uncompleted_prereqs =prereqs['uncompleted_prereqs']
+ 
     if request.method == "POST":
         messages.info(request, _('Badge "%s" retired.') % badge.title)
         badge.retired =False
@@ -246,7 +268,7 @@ def unretire(request, slug):
         return HttpResponseRedirect(reverse('badger.views.badges_list'))
 
     return render_to_response('%s/badge_unretire.html' % bsettings.TEMPLATE_BASE, dict(
-        badge=badge, awards_count=awards_count, request=request
+        progress=progress, user_award=user_award, badge=badge, awards_count=awards_count, request=request, prerequisites=prerequisites, completed_prereqs=completed_prereqs, uncompleted_prereqs=uncompleted_prereqs,   
     ), context_instance=RequestContext(request))
 
 
@@ -256,7 +278,16 @@ def retire(request, slug):
     badge = get_object_or_404(Badge, slug=slug)
     if not badge.allows_delete_by(request.user):
         return HttpResponseForbidden()
-
+    progress=Progress.objects.filter(user=request.user, badge=badge)
+    if progress:
+        progress=progress[0]
+    user_award=Award.objects.filter(badge=badge, user=request.user)
+ 
+    prerequisites=badge.prerequisites.all()
+    prereqs=badge.prerequisites_for_user(request.user)
+    completed_prereqs = prereqs['completed_prereqs']
+    uncompleted_prereqs =prereqs['uncompleted_prereqs']
+ 
     awards_count = badge.award_set.count()
 
     if request.method == "POST":
@@ -266,7 +297,7 @@ def retire(request, slug):
         return HttpResponseRedirect(reverse('badger.views.badges_list'))
 
     return render_to_response('%s/badge_retire.html' % bsettings.TEMPLATE_BASE, dict(
-        badge=badge, awards_count=awards_count, request=request
+        progress=progress, user_award=user_award, badge=badge, awards_count=awards_count, request=request, prerequisites=prerequisites, completed_prereqs=completed_prereqs, uncompleted_prereqs=uncompleted_prereqs,
     ), context_instance=RequestContext(request))
 
 
@@ -275,6 +306,16 @@ def retire(request, slug):
 def award_badge(request, slug):
     """Issue an award for a badge"""
     badge = get_object_or_404(Badge, slug=slug)
+    prerequisites=badge.prerequisites.all()
+    progress=Progress.objects.filter(user=request.user, badge=badge)
+    if progress:
+        progress=progress[0]
+    user_award=Award.objects.filter(badge=badge, user=request.user)
+ 
+    prereqs=badge.prerequisites_for_user(request.user)
+    completed_prereqs = prereqs['completed_prereqs']
+    uncompleted_prereqs =prereqs['uncompleted_prereqs']
+ 
     if not badge.allows_award_to(request.user):
         return HttpResponseForbidden('Award forbidden')
 
@@ -303,7 +344,7 @@ def award_badge(request, slug):
                                                 args=(badge.slug,)))
 
     return render_to_response('%s/badge_award.html' % bsettings.TEMPLATE_BASE, dict(
-        form=form, badge=badge, request=request
+        progress=progress, user_award=user_award, form=form, badge=badge, request=request, prerequisites=prerequisites, completed_prereqs=completed_prereqs, uncompleted_prereqs=uncompleted_prereqs,
     ), context_instance=RequestContext(request))
 
 
@@ -334,7 +375,16 @@ def award_detail(request, slug, id, format="html"):
     award = get_object_or_404(Award, badge=badge, pk=id)
     if not award.allows_detail_by(request.user):
         return HttpResponseForbidden('Award detail forbidden')
-
+    prerequisites=badge.prerequisites.all()
+    progress=Progress.objects.filter(user=request.user, badge=badge)
+    if progress:
+        progress=progress[0]
+    user_award=Award.objects.filter(badge=badge, user=request.user)
+ 
+    prereqs=badge.prerequisites_for_user(request.user)
+    completed_prereqs = prereqs['completed_prereqs']
+    uncompleted_prereqs =prereqs['uncompleted_prereqs']
+ 
     if format == 'json':
         data = simplejson.dumps(award.as_obi_assertion(request))
         resp = HttpResponse(data)
@@ -342,7 +392,7 @@ def award_detail(request, slug, id, format="html"):
         return resp
     else:
         return render_to_response('%s/award_detail.html' % bsettings.TEMPLATE_BASE, dict(
-            badge=badge, award=award, request=request
+            progress=progress, user_award=user_award, badge=badge, award=award, request=request, prerequisites=prerequisites, completed_prereqs=completed_prereqs, uncompleted_prereqs=uncompleted_prereqs,
         ), context_instance=RequestContext(request))
 
 
@@ -354,7 +404,16 @@ def award_delete(request, slug, id):
     award = get_object_or_404(Award, badge=badge, pk=id)
     if not award.allows_delete_by(request.user):
         return HttpResponseForbidden('Award delete forbidden')
-
+    prerequisites=badge.prerequisites.all()
+    progress=Progress.objects.filter(user=request.user, badge=badge)
+    if progress:
+        progress=progress[0]
+    user_award=Award.objects.filter(badge=badge, user=request.user)
+ 
+    prereqs=badge.prerequisites_for_user(request.user)
+    completed_prereqs = prereqs['completed_prereqs']
+    uncompleted_prereqs =prereqs['uncompleted_prereqs']
+ 
     if request.method == "POST":
         messages.info(request, _('Award for badge "%s" deleted.') %
                                badge.title)
@@ -363,7 +422,7 @@ def award_delete(request, slug, id):
         return HttpResponseRedirect(url)
 
     return render_to_response('%s/award_delete.html' % bsettings.TEMPLATE_BASE, dict(
-        badge=badge, award=award, request=request
+        progress=progress, user_award=user_award, badge=badge, award=award, request=request, prerequisites=prerequisites, completed_prereqs=completed_prereqs, uncompleted_prereqs=uncompleted_prereqs,
     ), context_instance=RequestContext(request))
 
 
@@ -545,6 +604,15 @@ def nomination_detail(request, slug, id, format="html"):
     badge = get_object_or_404(Badge, slug=slug)
     nomination = get_object_or_404(Nomination, badge=badge, pk=id)
     prerequisites=badge.prerequisites.all()
+    progress=Progress.objects.filter(user=request.user, badge=badge)
+    if progress:
+        progress=progress[0]
+    user_award=Award.objects.filter(badge=badge, user=request.user)
+ 
+    prereqs=badge.prerequisites_for_user(request.user)
+    completed_prereqs = prereqs['completed_prereqs']
+    uncompleted_prereqs =prereqs['uncompleted_prereqs']
+ 
     if not nomination.allows_detail_by(request.user):
         return HttpResponseForbidden()
     if request.method == "POST":
@@ -561,7 +629,7 @@ def nomination_detail(request, slug, id, format="html"):
     show_approve = not nomination.is_approved and nomination.allows_approve_by(request.user) 
     show_accept = nomination.is_approved and not nomination.is_accepted and nomination.allows_accept(request.user)
     return render_to_response('%s/nomination_detail.html' % bsettings.TEMPLATE_BASE,
-                              dict(prerequisites=prerequisites, show_approve=show_approve, show_accept=show_accept, request=request, badge=badge, nomination=nomination,),
+                              dict(progress=progress, user_award=user_award, prerequisites=prerequisites, completed_prereqs=completed_prereqs, uncompleted_prereqs=uncompleted_prereqs, show_approve=show_approve, show_accept=show_accept, request=request, badge=badge, nomination=nomination,),
                               context_instance=RequestContext(request))
 
 
@@ -572,7 +640,16 @@ def nominate_for(request, slug):
     badge = get_object_or_404(Badge, slug=slug)
     if not badge.allows_nominate_for(request.user):
         return HttpResponseForbidden()
-
+    prerequisites=badge.prerequisites.all()
+    progress=Progress.objects.filter(user=request.user, badge=badge)
+    if progress:
+        progress=progress[0]
+    user_award=Award.objects.filter(badge=badge, user=request.user)
+ 
+    prereqs=badge.prerequisites_for_user(request.user)
+    completed_prereqs = prereqs['completed_prereqs']
+    uncompleted_prereqs =prereqs['uncompleted_prereqs']
+ 
     if request.method != "POST":
         form = BadgeSubmitNominationForm()
     else:
@@ -596,5 +673,5 @@ def nominate_for(request, slug):
                                                 args=(badge.slug,)))
 
     return render_to_response('%s/badge_nominate_for.html' % bsettings.TEMPLATE_BASE,
-                              dict(request=request, form=form, badge=badge,),
+                              dict(user_award=user_award, progress=progress, request=request, form=form, badge=badge, prerequisites=prerequisites, completed_prereqs=completed_prereqs, uncompleted_prereqs=uncompleted_prereqs, ),
                               context_instance=RequestContext(request))
