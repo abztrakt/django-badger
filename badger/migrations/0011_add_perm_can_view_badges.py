@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
         ct, created = orm['contenttypes.ContentType'].objects.get_or_create(
             model='badge', app_label='badger') # model must be lowercase!
         perm, created = orm['auth.permission'].objects.get_or_create(
-            content_type=ct, codename='Badge', defaults=dict(name=u'Can view badges'))  
+            content_type=ct, codename='view_badge', defaults=dict(name=u'Can view badger'))  
 
     def backwards(self, orm):
         pass

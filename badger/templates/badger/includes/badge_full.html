@@ -58,7 +58,7 @@
             {% endif %}
     <dt>Actions:</dt>
     <dd><ul class="btn-list">
-        {% if perms.badger.edit_badge %}
+        {% if perms.badger.change_badge %}
             <li><a class="btn btn-primary edit_badge" href="{% url badger.views.edit badge.slug  %}">{{ _('Edit badge') }}</a></li>
         {% endif %}
         {% if perms.badger.delete_badge %}
@@ -71,10 +71,10 @@
             {% if perms.badger.add_nomination %}
                 <li><a class="btn btn-danger nominate_badge" href="{% url badger.views.nominate_for badge.slug %}">{{ _('Nominate badge') }}</a></li>
             {% endif %}
-            {% if retire %}
+            {% if retire and perms.badger.change_badge %}
                 <li><a class="btn btn-danger retire_badge" href="{% url badger.views.retire badge.slug %}">{{ _('Retire badge') }}</a></li>
             {% endif %}
-        {% else %}
+        {% elif perms.badger.change_badge %}
             <li><a class="btn btn-danger unretire_badge" href="{% url badger.views.unretire badge.slug %}">{{ _('Unretire badge') }}</a></li>
         {% endif %}
 
