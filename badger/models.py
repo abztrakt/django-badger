@@ -417,6 +417,7 @@ class Badge(models.Model):
         permissions = (
             ("manage_deferredawards",
              "Can manage deferred awards for this badge"),
+            ("view_badge", "Can view Badges"),
         )
 
     get_permissions_for = get_permissions_for
