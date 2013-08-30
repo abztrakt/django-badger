@@ -71,10 +71,10 @@
             {% if perms.badger.add_nomination %}
                 <li><a class="btn btn-danger nominate_badge" href="{% url badger.views.nominate_for badge.slug %}">{{ _('Nominate badge') }}</a></li>
             {% endif %}
-            {% if retire and perms.badger.change_badge %}
+            {% if retire and perms.badger.delete_badge %}
                 <li><a class="btn btn-danger retire_badge" href="{% url badger.views.retire badge.slug %}">{{ _('Retire badge') }}</a></li>
             {% endif %}
-        {% elif perms.badger.change_badge %}
+        {% elif perms.badger.delete_badge %}
             <li><a class="btn btn-danger unretire_badge" href="{% url badger.views.unretire badge.slug %}">{{ _('Unretire badge') }}</a></li>
         {% endif %}
 
