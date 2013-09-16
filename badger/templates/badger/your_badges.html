@@ -1,0 +1,62 @@
+{% extends "badger/base.html" %}
+{% load badger_tags %}
+
+{% block pageid %}badge_detail{% endblock %}
+
+{% block extrahead %}
+    <link rel="alternate" type="application/atom+xml"
+        title="{{ _('Recent awards') }}"
+        href="{% url badger.feeds.awards_by_badge 'atom' badge.slug %}" />
+    <link rel="alternate" type="application/json"
+        title="{{badge}} (JSON)')"
+        href="{% url badger.detail_json badge.slug %}" />
+{% endblock %}
+
+{% block content %}
+<section class="awards_list">
+    <h2>Your Earned Badges ({{ count }})</h2>
+    {% include "badger/includes/awards_as_badges_list.html" %}
+</section>
+
+<section class="badge_list">
+    <h2>Your Created Badges</h2>
+    {% include "badger/includes/badges_list.html" %}
+    </section>
+
+
+<section id="recent_nominations"> 
+    <h2>Your Nominations</h2>
+    
+    {% if nominations %}
+    <ul class="clearfix nominations">
+        {% for nomination in nominations %}
+            {% if not nomination.award %}
+                {% if nomination.approver %}
+                    <li class="nomination">
+                        <a href="{{ nomination.get_absolute_url }}" class="label">
+                            <span class="badge_title">{{ nomination.badge.title }}</span>
+                            <span class="relation">was approved for</span>
+                            <span class="user">{{ nomination.nominee }}</span>
+                            <span class="relation">by</span>
+                            <span class="user">{{ nomination.approver }}</span>
+                        </a>
+                    </li>
+
+                {% else %}
+                    <li class="nomination">
+                        <a href="{{ nomination.get_absolute_url }}" class="label">
+                            <span class="badge_title">{{ nomination.badge.title }}</span>
+                            <span class="relation">was nominated for</span>
+                            <span class="user">{{ nomination.nominee }}</span>
+                            <span class="relation">by</span>
+                            <span class="user">{{ nomination.creator }}</span>
+                        </a>
+                    </li>
+                
+                {% endif %} 
+            {% endif %}
+        {% endfor %}
+    </ul>
+    {% endif %}
+</section>
+{% endblock %}

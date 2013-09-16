@@ -1,4 +1,12 @@
-{% extends "badger_base.html" %}
+{% extends "base.html" %}
+
+{% block nav2 %} 
+    <section id="actions">
+        <a href="/badger/awards/feed">Awards Feed</a>
+        <a href="/badger/create">Create a Badge</a>
+        <a href="/badger/you">Your Badges</a>
+    </section>
+{% endblock %}
 
 {% block extra_styles %}
     <link href="/css/badger.css" rel="stylesheet" type="text/css" />
