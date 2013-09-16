@@ -1,20 +1,40 @@
 {% load badger_tags %}
 
 
+<dl id="container" class="badge" data-slug="{{ badge.slug }}">
+<div id="title" class="title">{{ badge.title }}</div>
 <dl class="badge" data-slug="{{ badge.slug }}">
-
-<dl class="badge" data-slug="{{ badge.slug }}">
-    <dt>Title:</dt>
-        <dd class="title">{{ badge.title }}</dd>
     {% if award and award.image %}
         <dt>Image:</dt>
             <dd class="image"><a href="{{ badge.get_absolute_url }}" class="image"><img src="{{ award.image.url }}" width="256" height="256" /></a></dd>
     {% else %}
         {% if badge.image %}
-        <dt>Image:</dt>
-            <dd class="image"><a href="{{ badge.get_absolute_url }}" class="image"><img src="{{ badge.image.url }}" width="256" height="256" /></a></dd>
+            <div class="image"><a href="{{ badge.get_absolute_url }}" class="image"><img src="{{ badge.image.url }}" width="256" height="256" /></a></div>
         {% endif %}
     {% endif %}
+    <ul class="btn-list">
+        {% if perms.badger.change_badge %}
+            <li><a class="btn btn-primary edit_badge" href="{% url badger.views.edit badge.slug  %}">{{ _('Edit') }}</a></li>
+        {% endif %}
+        {% if perms.badger.delete_badge %}
+            <li><a class="btn btn-danger delete_badge" href="{% url badger.views.delete badge.slug %}">{{ _('Delete') }}</a></li>
+        {% endif %}
+        {% if not badge.retired %}
+            {% if perms.badger.add_award %}
+                <li><a class="btn btn-primary award_badge" href="{% url badger.views.award_badge badge.slug %}">{{ _('Award') }}</a></li>
+            {% endif %}
+            {% if perms.badger.add_nomination %}
+                <li><a class="btn btn-danger nominate_badge" href="{% url badger.views.nominate_for badge.slug %}">{{ _('Nominate') }}</a></li>
+            {% endif %}
+            {% if retire and perms.badger.delete_badge %}
+                <li><a class="btn btn-danger retire_badge" href="{% url badger.views.retire badge.slug %}">{{ _('Retire') }}</a></li>
+            {% endif %}
+        {% elif perms.badger.delete_badge %}
+            <li><a class="btn btn-danger unretire_badge" href="{% url badger.views.unretire badge.slug %}">{{ _('Unretire') }}</a></li>
+        {% endif %}
+
+    </ul>
+
     {% if badge.description %}
         <dt>Description:</dt>
             <dd class="description">{{ badge.description }}</dd>
@@ -56,27 +76,4 @@
             {% else %}
                 <dd> No </dd>
             {% endif %}
-    <dt>Actions:</dt>
-    <dd><ul class="btn-list">
-        {% if perms.badger.change_badge %}
-            <li><a class="btn btn-primary edit_badge" href="{% url badger.views.edit badge.slug  %}">{{ _('Edit badge') }}</a></li>
-        {% endif %}
-        {% if perms.badger.delete_badge %}
-            <li><a class="btn btn-danger delete_badge" href="{% url badger.views.delete badge.slug %}">{{ _('Delete badge') }}</a></li>
-        {% endif %}
-        {% if not badge.retired %}
-            {% if perms.badger.add_award %}
-                <li><a class="btn btn-primary award_badge" href="{% url badger.views.award_badge badge.slug %}">{{ _('Award badge') }}</a></li>
-            {% endif %}
-            {% if perms.badger.add_nomination %}
-                <li><a class="btn btn-danger nominate_badge" href="{% url badger.views.nominate_for badge.slug %}">{{ _('Nominate badge') }}</a></li>
-            {% endif %}
-            {% if retire and perms.badger.delete_badge %}
-                <li><a class="btn btn-danger retire_badge" href="{% url badger.views.retire badge.slug %}">{{ _('Retire badge') }}</a></li>
-            {% endif %}
-        {% elif perms.badger.delete_badge %}
-            <li><a class="btn btn-danger unretire_badge" href="{% url badger.views.unretire badge.slug %}">{{ _('Unretire badge') }}</a></li>
-        {% endif %}
-
-    </ul></dd>
 </dl>
