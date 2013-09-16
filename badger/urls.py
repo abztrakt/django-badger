@@ -10,7 +10,8 @@ from . import views
 
 
 urlpatterns = patterns('badger.views',
-    url(r'^$', 'badges_list', name='badger.badges_list'),
+    url(r'^$', 'home', name='badger.home'),
+    url(r'^you$', 'your_badges', name='badger.your_badges'),
     url(r'^staff_tools$', 'staff_tools',
         name='badger.staff_tools'),
     url(r'^tag/(?P<tag_name>.+)/?$', 'badges_list',

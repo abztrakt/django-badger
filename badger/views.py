@@ -57,11 +57,25 @@ def home(request):
     badge_list = Badge.objects.order_by('-modified').all()[:bsettings.MAX_RECENT]
     award_list = Award.objects.order_by('-modified').all()[:bsettings.MAX_RECENT]
     badge_tags = Badge.objects.top_tags()
-
+    progresses=Progress.objects.filter(user=request.user)
+    progs=[]
+    for progress in progresses:
+        if progress.percent > .66:
+            progs.append(progress.badge)
     return render_to_response('%s/home.html' % bsettings.TEMPLATE_BASE, dict(
-        badge_list=badge_list, award_list=award_list, badge_tags=badge_tags
+        badge_list=badge_list, progress=progs, request=request,  award_list=award_list, badge_tags=badge_tags
     ), context_instance=RequestContext(request))
 
+@login_required
+def your_badges(request):
+    user = get_object_or_404(User, username=request.user.username)
+    nominations= Nomination.objects.filter(nominee=user)
+    created = Badge.objects.filter(creator=user)
+    awards = Award.objects.filter(user=user)
+    return render_to_response('%s/your_badges.html' % bsettings.TEMPLATE_BASE, dict(
+        award_list=awards, count=awards.count(), badges=created, request=request, user=user, nominations=nominations,
+    ), context_instance=RequestContext(request))
+   
 
 def badges_list(request, tag_name=None):
     """Badges list page"""
