@@ -50,7 +50,7 @@ from .models import (Badge, Award, Nomination, DeferredAward,
 from .forms import (BadgeAwardForm, DeferredAwardGrantForm,
                     DeferredAwardMultipleGrantForm, BadgeNewForm,
                     BadgeEditForm, BadgeSubmitNominationForm)
-
+from labgeeks_people.models import UserProfile
 
 def home(request):
     """Badger home page"""
@@ -78,7 +78,7 @@ def your_badges(request):
     created = Badge.objects.filter(creator=user)
     awards = Award.objects.filter(user=user)
     return render_to_response('%s/your_badges.html' % bsettings.TEMPLATE_BASE, dict(
-        award_list=awards, count=awards.count(), badges_list=created, request=request, user=user, nominations=nominations,
+        award_list=awards, count=awards.count(), badge_list=created, request=request, user=user, nominations=nominations,
     ), context_instance=RequestContext(request))
    
 
