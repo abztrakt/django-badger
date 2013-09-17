@@ -9,8 +9,9 @@
                 <img src="/media/img/default-badge.png"
             {% endif %}
         
-                alt="{{ badge.title }}" width="128" height="128" /></a>
-            <a href="{{ badge.get_absolute_url }}" class="label"><span class="title">{{ badge.title }}</span></a>
+                alt="{{ badge.title }}" id="thumbnail" width="128" height="128" /></a>
+<br>
+            <a href="{{ badge.get_absolute_url }}" class="label">{{ badge.title }}</a>
         </li>
     {% endfor %}
 </ul>

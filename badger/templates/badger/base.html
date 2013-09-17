@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% block nav2 %} 
-    <section id="actions">
-        <a href="/badger/awards/feed">Awards Feed</a>
-        <a href="/badger/create">Create a Badge</a>
-        <a href="/badger/you">Your Badges</a>
-    </section>
+    <ul class="nav nav-pills" id="actions">
+        <li><a href="/badger/awards/feed">Awards Feed</a></li>
+        <li><a href="/badger/you">Your Badges</a></li>
+	<li><a href="/badger/create">Create a Badge</a></li>
+    </ul>
 {% endblock %}
 
 {% block extra_styles %}

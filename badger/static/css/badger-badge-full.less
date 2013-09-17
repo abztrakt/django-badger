@@ -1,22 +1,26 @@
 @backgroundColor: #E2E0E6;
 
-div.image, img {
-	margin-left: auto;
-        margin-right: auto;
-	margin-bottom: 15px;
-}
-
-#title, .btn-list {
+#title, #container > .btn-list {
 	text-align: center;
 }
 
-.badge {
+.badge-detail {
 	color: black;
+	display: block;
+	border-radius: 15px;
 }
 
 #container {
 	width: 500px;
 	background-color: @backgroundColor;
+	div.image, img {
+		margin-left: auto;
+       		margin-right: auto;
+        	margin-bottom: 15px;
+	}
+	img {
+        	display: block;
+	}
 }
 
 dt, dd {
@@ -24,7 +28,7 @@ dt, dd {
 	text-shadow: none;
 }
 
-#container > .badge {
+#container > .badge-detail {
 	padding: 20px;
 	background-color: @backgroundColor;
 }
@@ -39,11 +43,7 @@ dt {
 	font-size: 22pt;
 }
 
-img {
-	display: block;
-}
-
-.btn-list {
+#container > .btn-list {
 	list-style-type: none;
 	margin-left: 0;
 	li {
