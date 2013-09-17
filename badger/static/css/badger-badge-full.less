@@ -11,7 +11,8 @@
 }
 
 #container {
-	width: 500px;
+	display: block;
+	max-width: 450px;
 	background-color: @backgroundColor;
 	div.image, img {
 		margin-left: auto;
@@ -43,11 +44,18 @@ dt {
 	font-size: 22pt;
 }
 
-#container > .btn-list {
-	list-style-type: none;
-	margin-left: 0;
+#container .btn-list {
 	li {
  	      	display: inline;
         	margin: 5px;
 	}	
+}
+
+.btn-list {
+	margin-left: 0;
+	list-style-type: none;
+}	
+
+section.badge {
+	background-color: #e2e0e6;
 }
