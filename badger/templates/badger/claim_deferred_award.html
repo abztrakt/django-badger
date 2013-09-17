@@ -21,10 +21,6 @@
         </header>
 
         <dl class="details">
-            {% if deferred_award.email %}
-                <dt>Email address:</dt>
-                    <dd><code class="email">{{ deferred_award.email }}</code></dd>
-            {% endif %}
             <dt>Claim code:</dt>
                 <dd><code>{{ deferred_award.claim_code }}</code></dd>
         </dl>
@@ -36,17 +32,7 @@
             </div>
         {% endif %}
 
-        {% if deferred_award|permissions_for:request.user|key:'grant_by' %}
-            <form id="grant_award" method="POST" action="">
-                <input type="hidden" name="is_grant" value="1" />
-                {% csrf_token %}
-                <h3>{{ _("Grant") }}</h3>
-                <p>{{ _("You can grant this award to someone else") }}
-                {{ grant_form.as_p }}
-                <input type="submit" class="btn btn-large btn-primary submit" value="{{ _("Grant this award") }}">
-            </form>
-        {% endif %}
-
+        
         {% if deferred_award|permissions_for:request.user|key:'claim_by' %}
         <form id="claim_award" method="POST" action="" class="{% if deferred_award.email and request.user.email != deferred_award.email %}email-mismatch{% endif %}">
             {% csrf_token %}
