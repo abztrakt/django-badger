@@ -52,6 +52,7 @@ from .forms import (BadgeAwardForm, DeferredAwardGrantForm,
                     BadgeEditForm, BadgeSubmitNominationForm)
 from labgeeks_people.models import UserProfile
 
+@login_required
 def home(request):
     """Badger home page"""
     badge_list = Badge.objects.order_by('-modified').all()
@@ -82,6 +83,7 @@ def your_badges(request):
     ), context_instance=RequestContext(request))
    
 
+@login_required
 def badges_list(request, tag_name=None):
     """Badges list page"""
     
@@ -111,6 +113,7 @@ def badges_list(request, tag_name=None):
         template_name='%s/badges_list.html' % bsettings.TEMPLATE_BASE)
 
 
+@login_required
 @require_http_methods(['HEAD', 'GET', 'POST'])
 def detail(request, slug, format="html"):
     """Badge detail view"""
@@ -263,6 +266,7 @@ def delete(request, slug):
     ), context_instance=RequestContext(request))
 
 
+@login_required
 def unretire(request, slug):
     """Delete a badge"""
     badge = get_object_or_404(Badge, slug=slug)
@@ -291,7 +295,7 @@ def unretire(request, slug):
     ), context_instance=RequestContext(request))
 
 
-
+@login_required
 def retire(request, slug):
     """Delete a badge"""
     badge = get_object_or_404(Badge, slug=slug)
@@ -367,6 +371,7 @@ def award_badge(request, slug):
     ), context_instance=RequestContext(request))
 
 
+@login_required
 @require_GET
 def awards_list(request, slug=None):
     queryset = Award.objects
@@ -387,6 +392,7 @@ def awards_list(request, slug=None):
         template_name='%s/awards_list.html' % bsettings.TEMPLATE_BASE)
 
 
+@login_required
 @require_http_methods(['HEAD', 'GET'])
 def award_detail(request, slug, id, format="html"):
     """Award detail view"""
@@ -457,6 +463,7 @@ def _do_claim(request, deferred_award):
         return HttpResponseRedirect(url)
 
 
+@login_required
 def _redirect_to_claimed_awards(awards, awards_ct):
     # Has this claim code already been used for awards?
     # If so, then a GET redirects to an award detail or list
@@ -472,6 +479,7 @@ def _redirect_to_claimed_awards(awards, awards_ct):
         return HttpResponseRedirect(url)
 
 
+@login_required
 @require_http_methods(['GET', 'POST'])
 def claim_deferred_award(request, claim_code=None):
     """Deferred award detail view"""
@@ -545,6 +553,7 @@ def claims_list(request, slug, claim_group, format="html"):
     ), context_instance=RequestContext(request))
 
 
+@login_required
 @require_GET
 def awards_by_user(request, username):
     """Badge awards by user"""
@@ -554,6 +563,8 @@ def awards_by_user(request, username):
         request=request, user=user, award_list=awards,
     ), context_instance=RequestContext(request))
 
+
+@login_required
 @require_GET
 def nominations_by_user(request, username):
     """Badge awards by user"""
@@ -564,6 +575,7 @@ def nominations_by_user(request, username):
     ), context_instance=RequestContext(request))
 
 
+@login_required
 @require_GET
 def awards_by_badge(request, slug):
     """Badge awards by badge"""
@@ -606,6 +618,7 @@ def staff_tools(request):
     ), context_instance=RequestContext(request))
 
 
+@login_required
 @require_GET
 def badges_by_user(request, username):
     """Badges created by user"""
