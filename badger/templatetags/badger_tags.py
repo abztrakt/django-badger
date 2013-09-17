@@ -35,27 +35,17 @@ def key(obj, name):
 
 @register.simple_tag
 def user_avatar(user, secure=False, size=256, rating='pg', default=''):
-
     try:
         profile = user.get_profile()
-        if profile.avatar:
-            return profile.avatar.url
+        if profile.staff_photo:
+            return profile.staff_photo.url
     except SiteProfileNotAvailable:
         pass
     except ObjectDoesNotExist:
         pass
     except AttributeError:
         pass
-
-    base_url = (secure and 'https://secure.gravatar.com' or
-        'http://www.gravatar.com')
-    m = hashlib.md5(user.email)
-    return '%(base_url)s/avatar/%(hash)s?%(params)s' % dict(
-        base_url=base_url, hash=m.hexdigest(),
-        params=urllib.urlencode(dict(
-            s=size, d=default, r=rating
-        ))
-    )
+    return "%s/img/stock_photo.jpg" % settings.STATIC_URL 
 
 
 
@@ -68,7 +58,9 @@ def award_image(award):
     elif award.badge.image:
         img_url = award.badge.image.url
     else:
-        img_url = "/media/img/default-badge.png"
+        img_url = "%s/img/default.png" % settings.STATIC_URL 
+
+
         
     return img_url
     

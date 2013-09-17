@@ -50,20 +50,25 @@ from .models import (Badge, Award, Nomination, DeferredAward,
 from .forms import (BadgeAwardForm, DeferredAwardGrantForm,
                     DeferredAwardMultipleGrantForm, BadgeNewForm,
                     BadgeEditForm, BadgeSubmitNominationForm)
-
+from labgeeks_people.models import UserProfile
 
 def home(request):
     """Badger home page"""
-    badge_list = Badge.objects.order_by('-modified').all()[:bsettings.MAX_RECENT]
-    award_list = Award.objects.order_by('-modified').all()[:bsettings.MAX_RECENT]
-    badge_tags = Badge.objects.top_tags()
+    badge_list = Badge.objects.order_by('-modified').all()
+    completed_prereqs =[]
+    uncompleted_prereqs =[]
+    for badge in badge_list:
+        if badge.is_awarded_to(request.user):
+            completed_prereqs.append(badge)
+        else:    
+            uncompleted_prereqs.append(badge)
     progresses=Progress.objects.filter(user=request.user)
     progs=[]
     for progress in progresses:
         if progress.percent > .66:
             progs.append(progress.badge)
     return render_to_response('%s/home.html' % bsettings.TEMPLATE_BASE, dict(
-        badge_list=badge_list, progress=progs, request=request,  award_list=award_list, badge_tags=badge_tags
+        uncompleted_prereqs=uncompleted_prereqs, completed_prereqs=completed_prereqs, badge_list=badge_list, progress=progs, request=request, 
     ), context_instance=RequestContext(request))
 
 @login_required
@@ -73,7 +78,7 @@ def your_badges(request):
     created = Badge.objects.filter(creator=user)
     awards = Award.objects.filter(user=user)
     return render_to_response('%s/your_badges.html' % bsettings.TEMPLATE_BASE, dict(
-        award_list=awards, count=awards.count(), badges=created, request=request, user=user, nominations=nominations,
+        award_list=awards, count=awards.count(), badge_list=created, request=request, user=user, nominations=nominations,
     ), context_instance=RequestContext(request))
    
 
