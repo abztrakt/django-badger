@@ -10,11 +10,10 @@
         
             <a href="{{ award.get_absolute_url }}" class="label awards-list">
                 <span class="badge_title">{{ award.badge.title }}</span>
-                <span class="relation">awarded to</span>
-<a href="{{ award.get_absolute_url }}" class="avatar_image"><img src="{% user_avatar award.user %}"
-                alt="{{ award.badge.title }}" width="24" height="24" /></a>
-                <span class="user">{{ award.user }}</span>
-            </a>
+                <span class="relation">awarded to</span></a>
+<a href="/people/{{ award.user }}" class="avatar_image"><img src="{% user_avatar award.user %}"
+                alt="{{ award.badge.title }}" width="24" height="24" />
+                <span class="user">{{ award.user }}</span></a>
         </li>
 
     {% endfor %}

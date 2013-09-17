@@ -32,7 +32,9 @@
         {% for nomination in nominations %}
             {% if not nomination.award %}
                 {% if nomination.approver %}
-                    <li class="nomination">
+                    <li class="badge">
+                        <a href="{{ nomination.get_absolute_url }}" class="label">
+                            <img src="{% badge_image nomination.badge %}" alt="{{ award.badge.title }}" width="128" height="128" /></a>
                         <a href="{{ nomination.get_absolute_url }}" class="label">
                             <span class="badge_title">{{ nomination.badge.title }}</span>
                             <span class="relation">was approved for</span>
@@ -43,7 +45,9 @@
                     </li>
 
                 {% else %}
-                    <li class="nomination">
+                    <li class="badge">
+                        <a href="{{ nomination.get_absolute_url }}" class="label">
+                            <img src="{% badge_image nomination.badge %}" alt="{{ award.badge.title }}" width="128" height="128" /></a>
                         <a href="{{ nomination.get_absolute_url }}" class="label">
                             <span class="badge_title">{{ nomination.badge.title }}</span>
                             <span class="relation">was nominated for</span>
