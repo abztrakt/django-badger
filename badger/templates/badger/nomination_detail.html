@@ -6,9 +6,9 @@
 {% block content %}
 <section class="row-fluid">
 
-    <section class="badge span4">
+    <section class="span4">
         <header class="page-header">
-            <h2>Badge: {{ badge.title }}</h2>
+            <h2> Badge: </h2>
         </header>
         {% include "badger/includes/badge_full.html" %}
     </section>
@@ -47,6 +47,21 @@
                         </form></li>
                     {% endif %}
                 </ul></dd>
+            {% if show_approve or show_accept %}
+                <dt>{{ _("Description:") }}</dt>
+                    {% if nomination.description %}
+                        <dd> {{ nomination.description }} </dd>
+                    {% else %}
+                        <dd> None </dd>
+                    {% endif %}
+                <dt> {{ _("Evidence:") }}</dt>
+                    {% if nomination.evidence %}
+                        <dd> {{ nomination.evidence }} </dd>
+                    {% else %}
+                        <dd> None </dd>
+                    {% endif %}
+            {% endif %}
+
             {% if nomination.award %}
                 <dt>{{ _("Award:") }}</dt>
                     <dd><a href="{{ nomination.award.get_absolute_url }}">{{ nomination.award }}</a></dd>

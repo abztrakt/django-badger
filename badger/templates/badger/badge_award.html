@@ -3,17 +3,26 @@
 {% block pageid %}badge_award{% endblock %}
 
 {% block content %}
-<h2>Award a badge</h2>
-<form id="award_badge" method="POST" action="" enctype="multipart/form-data">
-    {% csrf_token %}
-    <ul>
-        {{ form.as_ul }}
-        <li><input type="submit" class="submit" value="Award"></li>
-    </ul>
-</form>
+<section class="row-fluid">
+    <section class="span4">
+        <header class="page-header">
+            <h2>Badge: {{ badge_title }}</h2>
+        </header>
+        {% include "badger/includes/badge_full.html" %}
+    </section>
 
-<section class="badge">
-    <h3>Badge</h3>
-    {% include "badger/includes/badge_full.html" %}
+    <section class="span8">
+        <header class="page-header">
+            <h2>Award a Badge</h2>
+        </header>
+        <form id="award_badge" method="POST" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+            <ul>
+                {{ form.as_ul }}
+                <li><input type="submit" class="submit" value="Award"></li>
+            </ul>
+        </form>
+    </section>
 </section>
+
 {% endblock %}

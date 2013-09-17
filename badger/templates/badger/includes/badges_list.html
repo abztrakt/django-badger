@@ -1,15 +1,12 @@
+{% load badger_tags %}
+
 <ul class="badges">
     {% for badge in badge_list %}
 
         <li class="badge">
             <a href="{{ badge.get_absolute_url }}" class="image">
-            {% if badge.image %}
-                <img src="{{badge.image.url}}" 
-            {% else %}
-                <img src="/media/img/default-badge.png"
-            {% endif %}
-        
-                alt="{{ badge.title }}" id="thumbnail" width="128" height="128" /></a>
+                <img src="{% badge_image badge %}" alt="{{ badge.title }}" id="thumbnail" width="128" height="128" />
+            </a>
 <br>
             <a href="{{ badge.get_absolute_url }}" class="label">{{ badge.title }}</a>
         </li>

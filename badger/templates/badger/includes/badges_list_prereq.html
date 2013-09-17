@@ -1,17 +1,11 @@
+{% load badger_tags %}
 <ul class="badges">
     {% for badge in completed_prereqs %}
 
         <li class="badge">
             <a href="{{ badge.get_absolute_url }}" class="image">
-            {% if badge.image %}
-                <img src="{{badge.image.url}}" 
-            {% else %}
-                <img src="/media/img/default-badge.png"
-            {% endif %}
-        
-                alt="{{ badge.title }}" width="128" height="128" /></a>
-            <br>
-	    <a href="{{ badge.get_absolute_url }}" class="label"><span class="title">{{ badge.title }}</span></a>
+                <img src="{% badge_image badge %}" alt="{{ badge.title }}" width="128" height="128" /></a>
+            <a href="{{ badge.get_absolute_url }}" class="label"><span class="title">{{ badge.title }}</span></a>
             <a href="{{ badge.get_absolute_url }}" class="label"><i class="icon-ok"></i></a>
         </li>
     {% endfor %}
@@ -20,14 +14,7 @@
 
         <li class="badge">
             <a href="{{ badge.get_absolute_url }}" class="image">
-            {% if badge.image %}
-                <img src="{{badge.image.url}}" 
-            {% else %}
-                <img src="/media/img/default-badge.png"
-            {% endif %}
-        
-                alt="{{ badge.title }}" width="128" height="128" /></a>
-		<br>
+                <img src="{% badge_image badge %}" alt="{{ badge.title }}" width="128" height="128" /></a>
             <a href="{{ badge.get_absolute_url }}" class="label"><span class="title">{{ badge.title }}</span></a>
         </li>
     {% endfor %}

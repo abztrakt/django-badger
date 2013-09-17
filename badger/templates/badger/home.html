@@ -1,4 +1,5 @@
 {% extends "badger/base.html" %}
+{% load badger_tags %}
 
 {% block pageid %}home{% endblock %}
 
@@ -16,13 +17,7 @@
 
             <li class="badge">
                 <a href="{{ badge.get_absolute_url }}" class="image">
-                {% if badge.image %}
-                    <img src="{{badge.image.url}}" 
-                {% else %}
-                    <img src="/media/img/default-badge.png"
-                {% endif %}
-            
-                    alt="{{ badge.title }}" width="128" height="128" /></a>
+                  <img src="{% badge_image badge %}" alt="{{ badge.title }}" width="128" height="128" /></a>
                 <a href="{{ badge.get_absolute_url }}" class="label"><span class="title">{{ badge.title }}</span></a>
             </li>
         {% endfor %}

@@ -10,16 +10,20 @@
 {% endblock %}
 
 {% block content %}
+<section class="row-fluid">
+    <section class="span4">
+        <header class="page-header">  
+            <h2>Badge: </h3>
+        </header>
+        {% include "badger/includes/badge_full.html" %}
+    </section>
 
-<h2>Award detail</h2>
+    <section class="award span8">
+        <header class="page-header">
+            <h2>Award detail</h2>
+        </header>
+        {% include "badger/includes/award_full.html" %}
+    </section>
 
-<section class="award">
-    {% include "badger/includes/award_full.html" %}
-</section>
-
-<section class="badge">
-    <h3>Badge</h3>
-    {% include "badger/includes/badge_full.html" %}
-</section>
 
 {% endblock %}

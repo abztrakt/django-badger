@@ -48,17 +48,22 @@ def user_avatar(user, secure=False, size=256, rating='pg', default=''):
     return "%s/img/stock_photo.jpg" % settings.STATIC_URL 
 
 
+@register.simple_tag
+def badge_image(badge):
+    if badge.image:
+        img_url = badge.image.url
+    else:
+        img_url = "%s/img/default-badge.png" % settings.STATIC_URL
+    return img_url
 
 @register.simple_tag
 def award_image(award):
-
-
     if award.image:
         img_url = award.image.url
     elif award.badge.image:
         img_url = award.badge.image.url
     else:
-        img_url = "%s/img/default.png" % settings.STATIC_URL 
+        img_url = "%s/img/default-badge.png" % settings.STATIC_URL 
 
 
         
