@@ -254,7 +254,7 @@ class SearchManagerMixin(object):
             and grouping quoted words together.
             Example:
             
-            >>> normalize_query('  some random  words "with   quotes  " and   spaces')
+            normalize_query('  some random  words "with   quotes  " and   spaces')
             ['some', 'random', 'words', 'with quotes', 'and', 'spaces']
         
         '''
