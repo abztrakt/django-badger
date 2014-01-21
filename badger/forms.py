@@ -113,10 +113,12 @@ class MultiEmailField(MultipleItemsField):
 class BadgeAwardForm(MyModelForm):
     """Form to create either a real or deferred badge award"""
     # TODO: Needs a captcha?
+    user = forms.ModelChoiceField(queryset=User.objects.order_by('uwnetid'))
+
     class Meta:
         model = Award
         fields = ('description', 'user',)
-    
+
     def __init__(self, *args, **kwargs):
         super(BadgeAwardForm, self).__init__(*args, **kwargs)
 
