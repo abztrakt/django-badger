@@ -8,7 +8,6 @@ from .feeds import (AwardsRecentFeed, AwardsByUserFeed, AwardsByBadgeFeed,
                     BadgesRecentFeed, BadgesByUserFeed)
 from . import views
 
-
 urlpatterns = patterns('badger.views',
     url(r'^$', 'home', name='badger.home'),
     url(r'^you$', 'your_badges', name='badger.your_badges'),

@@ -2,6 +2,32 @@
 
 {% block pageid %}badge_award{% endblock %}
 
+{% block pageJS %}
+    <script src="/static/js/jquery-ui-1.10.4.custom.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.autocomplete.js"></script>
+{% endblock %}
+
+{% block pageCSS %}
+     .custom-combobox {
+     position: relative;
+     display: inline-block;
+     }
+     .custom-combobox-toggle {
+     position: absolute;
+     top: 0;
+     bottom: 0;
+     margin-left: -1px;
+     padding: 0;
+     /* support: IE7 */
+     *height: 1.7em;
+     *top: 0.1em;
+     }
+     .custom-combobox-input {
+     margin: 0;
+     padding: 0.3em;
+     }
+{% endblock %}
+
 {% block content %}
 <section class="row-fluid">
     <section class="span4">
@@ -17,10 +43,12 @@
         </header>
         <form id="award_badge" method="POST" action="" enctype="multipart/form-data">
             {% csrf_token %}
+            <div class="ui-widget" name="combobox">
             <ul>
                 {{ form.as_ul }}
                 <li><input type="submit" class="submit" value="Award"></li>
             </ul>
+            </div>
         </form>
     </section>
 </section>
