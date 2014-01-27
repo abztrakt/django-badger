@@ -2640,6 +2640,7 @@ $( "#combobox" ).toggle();
 
 $(document).ready(function() {
     $('[name=combobox] #id_user').combobox();
+    $('[name=combobox] #id_nominee').combobox();
     $('[name=combobox] .ui-button').css('height',$('.custom-combobox input').css('height'));
     $('.custom-combobox input').css('float', 'left');
     var leftPX = (Math.round($('.ui-button').position().left)) + 'px';
