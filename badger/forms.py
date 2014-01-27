@@ -194,6 +194,7 @@ class BadgeNewForm(BadgeEditForm):
 
 class BadgeSubmitNominationForm(MyModelForm):
     """Form to submit badge nominations"""
+    nominee = forms.ModelChoiceField(queryset=User.objects.order_by('username'))
     class Meta:
         model = Nomination
         fields = ('nominee', 'description', 'evidence')
