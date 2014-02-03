@@ -1,0 +1,23 @@
+{% extends "badger/base.html" %}
+{% load badger_tags %}
+
+{% block pageid %}tags_list{% endblock %}
+
+{%block content %}
+<section class="badges_list">
+    <h2>All Tags</h2>
+    <ul style="width: 150px;">
+        {% for tag in tag_list %}
+             {% if tag_list %}
+                <a href="tag/{{tag}}">
+                    <li class="badge-tag btn btn-default btn-block">
+                       {{ tag }}
+                    </li>
+                </a>
+            {% else %}
+                <p>You have no tags.</p>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}
