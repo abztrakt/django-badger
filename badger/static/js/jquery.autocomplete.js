@@ -2662,4 +2662,9 @@ $(document).ready(function() {
             'left':leftPX
         });
     });
+
+    $("body [id^=ui-id]").css({
+        'height':'400px',
+        'overflow':'auto'
+    });
 });
