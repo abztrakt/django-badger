@@ -2619,6 +2619,15 @@ this.input
 .val( "" )
 .attr( "title", value + " didn't match any item" )
 .tooltip( "open" );
+
+
+var leftPX = (Math.round($('.custom-combobox-input').position().left)) + 'px';
+$("[class^=ui-tooltip]").css({
+    'width':'15em',
+    'text-align':'center',
+    'left':leftPX
+});
+
 this.element.val( "" );
 this._delay(function() {
 this.input.tooltip( "close" ).attr( "title", "" );
