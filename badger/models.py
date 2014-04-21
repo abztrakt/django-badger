@@ -371,6 +371,9 @@ class BadgeManager(models.Manager, SearchManagerMixin):
 
         return tags_with_counts
 
+#This is a fix to allow a custom attribute to the meta class.
+#This will break if django add its own how_long attribute.
+models.options.DEFAULT_NAMES += ('how_long',)
 
 class Badge(models.Model):
     """Representation of a badge"""
@@ -414,6 +417,7 @@ class Badge(models.Model):
     class Meta:
         unique_together = ('title', 'slug')
         ordering = ['-modified', '-created']
+        how_long = models.TimeField
         permissions = (
             ("manage_deferredawards",
              "Can manage deferred awards for this badge"),
@@ -550,8 +554,8 @@ class Badge(models.Model):
                 prerequisites['completed_prereqs'].append(prereq)
             else:
                 prerequisites['uncompleted_prereqs'].append(prereq)
-        return prerequisites    
-    
+        return prerequisites
+
     def check_prerequisites(self, awardee):
         """Check the prerequisites for this badge. If they're all met, award
         this badge to the user."""
@@ -1070,6 +1074,7 @@ class DeferredAward(models.Model):
                 BadgeAwardNotAllowedException), e:
             # Just swallow up and ignore any issues in awarding.
             award = None
+        #maybe try an else here
         if not self.reusable:
             # Self-destruct, if not made reusable.
             self.delete()
