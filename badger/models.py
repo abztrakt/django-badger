@@ -972,7 +972,10 @@ class DeferredAwardManager(models.Manager):
     def _claim_qs(self, awardee, qs):
         """Claim all the deferred awards that match the queryset"""
         for da in qs:
-            da.claim(awardee)
+            """Only milestone badges(badge with more than one prerequisite)
+            may be added automatically. Others must be manually awarded."""
+            if(len(da.badge.prerequisites.all()) > 1):
+                da.claim(awardee)
 
 
 def make_random_code():
@@ -1073,6 +1076,7 @@ class DeferredAward(models.Model):
         except (BadgeAlreadyAwardedException,
                 BadgeAwardNotAllowedException), e:
             # Just swallow up and ignore any issues in awarding.
+            print "Passed exception"
             award = None
         #maybe try an else here
         if not self.reusable:
