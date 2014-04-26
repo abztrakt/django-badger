@@ -559,10 +559,11 @@ class Badge(models.Model):
     def check_prerequisites(self, awardee):
         """Check the prerequisites for this badge. If they're all met, award
         this badge to the user."""
-        if self.is_awarded_to(awardee):
+        #this check is unnecessary and breaks nominating/awarding badges
+        #if self.is_awarded_to(awardee):
             # Not unique, but badge auto-award from prerequisites should only
             # happen once.
-            return False
+        #    return False
         for badge in self.prerequisites.all():
             if not badge.is_awarded_to(awardee):
                 # Bail on the first unmet prerequisites
