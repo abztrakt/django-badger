@@ -2664,7 +2664,7 @@ $(document).ready(function() {
     });
 
     $("body [id^=ui-id]").css({
-        'height':'400px',
+        'max-height':'400px',
         'overflow':'auto'
     });
 });
