@@ -1073,7 +1073,6 @@ class DeferredAward(models.Model):
         except (BadgeAlreadyAwardedException,
                 BadgeAwardNotAllowedException), e:
             # Just swallow up and ignore any issues in awarding.
-            print "Passed exception"
             award = None
         if not self.reusable:
             # Self-destruct, if not made reusable.
