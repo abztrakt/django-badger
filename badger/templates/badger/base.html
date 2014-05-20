@@ -4,11 +4,17 @@
     <ul class="nav nav-pills" id="actions">
        <li><a href="/badger">Home</a></li>
        <li><a href="/badger/awards/feed">Awards Feed</a></li>
-       <li><a href="/badger/create">Create a Badge</a></li>
+       {% if perms.badger.add_badge %}
+        <li><a href="/badger/create">Create a Badge</a></li>
+       {% endif %}
        <li><a href="/badger/you">Your Badges</a></li>
+       <li><a href="/badger/tag">Badge Tags</a></li>
     </ul>
 {% endblock %}
 
 {% block extra_styles %}
     <link href="/css/badger.css" rel="stylesheet" type="text/css" />
 {% endblock extra_styles %}
+
+{% block extra_js %}
+{% endblock extra_js %}

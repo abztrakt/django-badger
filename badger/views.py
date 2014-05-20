@@ -84,9 +84,14 @@ def your_badges(request):
    
 
 @login_required
+def tag_list(request):
+    tags = Tag.objects.all().order_by('slug')
+    user = request.user;
+    return render_to_response('%s/tags_list.html' % bsettings.TEMPLATE_BASE, {'tag_list':tags, 'request':request}, context_instance=RequestContext(request))
+
+@login_required
 def badges_list(request, tag_name=None):
     """Badges list page"""
-    
     award_list = None
     query_string = request.GET.get('q', None)
     if query_string is not None:
@@ -194,10 +199,7 @@ def create(request):
             form.save_m2m()
             return HttpResponseRedirect(reverse(
                     'badger.views.detail', args=(new_sub.slug,)))
-
-    return render_to_response('%s/badge_create.html' % bsettings.TEMPLATE_BASE, dict(
-        form=form, request=request
-    ), context_instance=RequestContext(request))
+    return render_to_response('%s/badge_create.html' % bsettings.TEMPLATE_BASE, dict(form=form, request=request), context_instance=RequestContext(request))
 
 
 @require_http_methods(['GET', 'POST'])
@@ -205,9 +207,9 @@ def create(request):
 def edit(request, slug):
     """Edit an existing badge"""
     badge = get_object_or_404(Badge, slug=slug)
+    badge.tags.all = badge.tags.all().order_by('slug')
     if not badge.allows_edit_by(request.user):
         return HttpResponseForbidden()
-    
     if request.method != "POST":
         form = BadgeEditForm(instance=badge)
     else:
@@ -219,22 +221,18 @@ def edit(request, slug):
             progresses=Progress.objects.filter(badge=badge)
             for prog in progresses:
                 if not badge.check_prerequisites(prog.user):
-                    prog.percent =0.0
+                    prog.percent = 0.0
                     count=badge.prerequisites.count()
                     for prereq in prog.badge.prerequisites.all():
                         if Award.objects.filter(badge=prereq, user=prog.user):
-                            prog.percent += 100.0/count
+                            prog.percent += 100.0 / count
                     prog.save()
                 else:
                     badge.award_to(prog.user)
                     prog.delete()
-  
             return HttpResponseRedirect(reverse(
                     'badger.views.detail', args=(new_sub.slug,)))
-
-    return render_to_response('%s/badge_edit.html' % bsettings.TEMPLATE_BASE, dict(
-        badge=badge, form=form, request=request
-    ), context_instance=RequestContext(request))
+    return render_to_response('%s/badge_edit.html' % bsettings.TEMPLATE_BASE, dict(badge=badge, form=form, request=request), context_instance=RequestContext(request))
 
 
 @require_http_methods(['GET', 'POST'])
