@@ -650,7 +650,11 @@ def nomination_detail(request, slug, id, format="html"):
         if action == 'approve_by':
             nomination.approve_by(request.user)
         elif action == 'accept':
-            nomination.accept(request.user)
+            try:
+                nomination.accept(request.user)
+            except BadgePrerequisitesNotFullfilledException:
+                msg = "The badge "+badge.title +" does not have the prerequisites completed for user " + request.user.username
+                return render_to_response('%s/fail.html' %bsettings.TEMPLATE_BASE, dict(request=request, message=msg), context_instance=RequestContext(request))
         elif action == 'reject_by':
             nomination.reject_by(request.user)
         return HttpResponseRedirect(reverse(
