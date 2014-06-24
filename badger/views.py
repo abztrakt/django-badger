@@ -332,11 +332,11 @@ def award_badge(request, slug):
     if progress:
         progress=progress[0]
     user_award=Award.objects.filter(badge=badge, user=request.user)
- 
+
     prereqs=badge.prerequisites_for_user(request.user)
     completed_prereqs = prereqs['completed_prereqs']
     uncompleted_prereqs =prereqs['uncompleted_prereqs']
- 
+
     if not badge.allows_award_to(request.user):
         return HttpResponseForbidden('Award forbidden')
 
