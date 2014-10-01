@@ -9,6 +9,7 @@ badger/middleware.py
 badger/models.py
 badger/printing.py
 badger/signals.py
+badger/tests.py
 badger/urls.py
 badger/urls_simple.py
 badger/utils.py
