@@ -3,7 +3,7 @@ import re
 import random
 import hashlib
 
-from datetime import datetime, timedelta, tzinfo
+import datetime
 from time import time, gmtime, strftime
 
 import os.path
@@ -106,7 +106,7 @@ DEFAULT_BADGE_IMAGE = getattr(settings, 'BADGER_DEFAULT_BADGE_IMAGE',
 DEFAULT_BADGE_IMAGE_URL = getattr(settings, 'BADGER_DEFAULT_BADGE_IMAGE_URL',
     urljoin(getattr(settings, 'MEDIA_URL', '/media/'), 'img/default-badge.png'))
 
-TIME_ZONE_OFFSET = getattr(settings, "TIME_ZONE_OFFSET", timedelta(0))
+TIME_ZONE_OFFSET = getattr(settings, "TIME_ZONE_OFFSET", datetime.timedelta(0))
 
 MK_UPLOAD_TMPL = '%(base)s/%(h1)s/%(h2)s/%(hash)s_%(field_fn)s_%(now)s_%(rand)04d.%(ext)s'
 

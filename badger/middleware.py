@@ -1,12 +1,12 @@
 import logging
 import time
-from datetime import datetime
 from django.conf import settings
 
 from .models import (Badge, Award, BadgePrerequisitesNotFullfilledException)
 from django.shortcuts import render_to_response
 from badger import settings as bsettings
 from django.template import RequestContext
+import datetime
 
 
 LAST_CHECK_COOKIE_NAME = getattr(settings,
@@ -24,7 +24,7 @@ class RecentBadgeAwardsList(object):
         # Try to fetch and parse the timestamp of the last award check, fall
         # back to None
         try:
-            self.last_check = datetime.fromtimestamp(float(
+            self.last_check = datetime.datetime.fromtimestamp(float(
                 self.request.COOKIES[LAST_CHECK_COOKIE_NAME]))
         except (KeyError, ValueError), e:
             self.last_check = None
