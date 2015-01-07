@@ -7,14 +7,14 @@
 
 {% block content %}
 
-<section class="span4" id="detail">
+<section class="col-md-4" id="detail">
     <header class="page-header">
         <h2>Badge: {{ badge_title }}</h2>
     </header>
     {% include "badger/includes/badge_full.html" %}
 </section>
 
-<section class="span8">
+<section class="col-md-8">
     <header class="page-header">
         <h2>{{ _("Unretire badge") }}</h2>
     </header>
@@ -27,7 +27,7 @@
             {% endblocktrans %}</p>
         <p>{{ _("Are you sure?") }}</p>
         <ul>
-            <li><input type="submit" class="btn btn-large btn-danger submit" value="{{ _("Unretire badge") }}"></li>
+            <li><input type="submit" class="btn btn-lg btn-danger submit" value="{{ _("Unretire badge") }}"></li>
         </ul>
     </form>
 </section>

@@ -4,16 +4,16 @@
 {% block pageid %}nomination_detail{% endblock %}
 
 {% block content %}
-<section class="row-fluid">
+<section class="row">
 
-    <section class="span4">
+    <section class="col-md-4">
         <header class="page-header">
             <h2> Badge: </h2>
         </header>
         {% include "badger/includes/badge_full.html" %}
     </section>
 
-    <section class="nomination span8">
+    <section class="nomination col-md-8">
         <header class="page-header">
             <h2>{{ _("Nomination detail") }}</h2>
         </header>
@@ -23,14 +23,14 @@
                     <li><form method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="approve_by" />
-                            <button class="btn btn-large btn-primary">{{ _('Approve nomination') }}</button>
+                            <button class="btn btn-lg btn-primary">{{ _('Approve nomination') }}</button>
                         </form></li>
                     {% endif %}
                     {% if show_accept %} 
                         <li><form method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="accept" />
-                            <button class="btn btn-large btn-primary">
+                            <button class="btn btn-lg btn-primary">
                                 {% if request.user == nomination.user %}
                                     {{ _('Accept your nomination') }}
                                 {% else %}
@@ -43,7 +43,7 @@
                     <li><form method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="reject_by" />
-                            <button class="btn btn-large btn-danger">{{ _('Reject nomination') }}</button>
+                            <button class="btn btn-lg btn-danger">{{ _('Reject nomination') }}</button>
                         </form></li>
                     {% endif %}
                 </ul></dd>
