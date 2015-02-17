@@ -9,19 +9,19 @@
 <header class="page-header">
     <h2>{{ _("Delete Award") }}</h2>
 </header>
-<section class="row-fluid">
+<section class="row">
 
-    <section class="badge span4">
+    <section class="badge col-md-4">
         {% include "badger/includes/badge_full.html" %}
     </section>
 
-    <section class="award span8">
+    <section class="award col-md-8">
 
         <form id="delete_award" method="POST" action="" enctype="multipart/form-data">
             {% csrf_token %}
             <p><strong>{{ _("Delete this award, are you sure?") }}</strong></p>
             <ul>
-                <li><input type="submit" class="btn btn-large btn-danger submit" value="{{ _("Yes, delete award") }}"></li>
+                <li><input type="submit" class="btn btn-lg btn-danger submit" value="{{ _("Yes, delete award") }}"></li>
             </ul>
         </form>
 

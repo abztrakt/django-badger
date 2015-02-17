@@ -20,11 +20,12 @@
     <header>
         <h2>Create a badge</h2>
     </header>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
     <form id="create_badge" method="POST" action="" enctype="multipart/form-data">
         {% csrf_token %}
         <ul>
                 <li class="required">
-                  <label for="id_title">Title: </label>
+                  <label for="id_title">Title: </label><br />
                   {{ form.title }}
                   <p class="help">{{ form.title.help_text }}</p>
                 </li>
@@ -33,13 +34,13 @@
                   {{ form.image }}
                   <p class="help">{{ form.image.help_text }}</p>
                 </li>
-                <li>
-                  <label for="id_description">Description: </label>
+                <li class="col-xs-12">
+                  <label for="id_description">Description: </label><br />
                   {{ form.description }}
                   <p class="help">{{ form.description.help_text }}</p>
                 </li>
                 <li>
-                  <label for="id_tags">Tags: </label>
+                  <label for="id_tags">Tags: </label><br />
  {# Checking if the user has permissions to add a tag. If they do, then the normal tag text field is used. If they do not, they get a chosen tag field with current tag options to choose from. #}
                  {% if perms.taggit.add_tag %}
                     {{ form.tags }}
@@ -60,27 +61,28 @@
                  <p class="help"></p>
                 </li>
                 <li>
-                  <label for="id_unique">Unique: </label>
+                  <label for="id_unique">Unique: </label><br />
                   {{ form.unique }}
                   <p class="help">{{ form.unique.help_text }}</p>
                 </li>
                 <li>
-                  <label for="id_prerequisites">Prerequisites: </label>
+                  <label for="id_prerequisites">Prerequisites: </label><br />
                   {{ form.prerequisites }}
                   <p class="help">{{ form.prerequisites.help_text }}</p>
                 </li>
                 <li>
-                  <label for="id_nominations_accepted">Nominations accepted: </label>
+                  <label for="id_nominations_accepted">Nominations accepted: </label><br />
                   {{ form.nominations_accepted }}
                   <p class="help">{{ form.nominations_accepted.help_text }}</p>
                 </li>
                 <li>
-                  <label for="id_nominations_autoapproved">Nominations autoapproved: </label>
+                  <label for="id_nominations_autoapproved">Nominations autoapproved: </label><br />
                   {{ form.nominations_autoapproved }}
                   <p class="help">{{ form.nominations_autoapproved.help_text }}</p>
                 </li>
             <li><input type="submit" class="submit" value="Create badge"></li>
         </ul>
     </form>
+    </div>
 </section>
 {% endblock %}

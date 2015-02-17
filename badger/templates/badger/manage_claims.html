@@ -6,16 +6,16 @@
 {% endblock %}
 
 {% block content %}
-<section class="row-fluid">
+<section class="row">
 
-    <section class="badge span4">
+    <section class="badge col-md-4">
         <header class="page-header">
             <h2 class="badge-title">{{ _("Badge: {badge_title}") | f(badge_title=badge.title) }}</h2>
         </header>
         {% include "badger/includes/badge_full.html" %}
     </section>
 
-    <section class="claims_list span8">
+    <section class="claims_list col-md-8">
         <header class="page-header">
             <h2>{{ _("Manage claim codes") }}</h2>
         </header>
@@ -28,7 +28,7 @@
                     <option value="{{ x }}">{{ _('{num} single-use claim codes') | f(num=x) }}</option>
                 {% endfor %}
             </select>
-            <input type="submit" class="btn btn-large btn-primary submit" value="{{ _("Generate") }}">
+            <input type="submit" class="btn btn-lg btn-primary submit" value="{{ _("Generate") }}">
         </form>
         <ul class="claim_groups">
             {% for item in claim_groups %}
@@ -50,7 +50,7 @@
                             title="{{ _("Download claim codes as printable PDF") }}"
                             href="{{ url('badger.claims_list_pdf', slug=badge.slug, claim_group=item.claim_group) }}">{{ _("PDF") }}</a>
                     {% else %}
-                        <a class="btn" target="_blank" href="{{ url('badger.claims_list', badge.slug, item.claim_group) }}">
+                        <a class="btn btn-default" target="_blank" href="{{ url('badger.claims_list', badge.slug, item.claim_group) }}">
                             <strong class="modified">{{ item.modified }}</strong>
                             &#8212;
                             <span class="count">{{ _('1 reusable code') }}</span>
