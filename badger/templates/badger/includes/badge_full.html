@@ -21,10 +21,10 @@
         {% endif %}
         {% if not badge.retired %}
             {% if perms.badger.add_award %}
-                <li><a class="btn btn-primary award_badge" href="{% url badger.views.award_badge badge.slug %}">{{ _('Award') }}</a></li>
+                <li><a class="btn btn-success award_badge" href="{% url badger.views.award_badge badge.slug %}">{{ _('Award') }}</a></li>
             {% endif %}
             {% if perms.badger.add_nomination %}
-                <li><a class="btn btn-danger nominate_badge" href="{% url badger.views.nominate_for badge.slug %}">{{ _('Nominate') }}</a></li>
+                <li><a class="btn btn-warning nominate_badge" href="{% url badger.views.nominate_for badge.slug %}">{{ _('Nominate') }}</a></li>
             {% endif %}
             {% if retire and perms.badger.delete_badge %}
                 <li><a class="btn btn-danger retire_badge" href="{% url badger.views.retire badge.slug %}">{{ _('Retire') }}</a></li>
