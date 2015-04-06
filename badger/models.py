@@ -332,7 +332,7 @@ class BadgeManager(models.Manager, SearchManagerMixin):
     def allows_add_by(self, user):
         if getattr(settings, "BADGER_ALLOW_ADD_BY_ANYONE", False):
             return True
-        if user.has_perm('badger.add_badge'):
+        if user.has_perm('badger.can_add_badge'):
             return True
         return False
 
