@@ -227,7 +227,9 @@ def create(request):
         return render_to_response('fail.html', params)
 
     if not Badge.objects.allows_add_by(request.user):
-        return HttpResponseForbidden()
+        params['message'] = 'Unauthorized'
+        params['reason'] = 'You are not authorized to create badges.'
+        return render_to_response('fail.html', params)
 
     if request.method != "POST":
         form = BadgeNewForm()
