@@ -31,7 +31,7 @@
 <dl class="actions">
     <dt>Actions:</dt>
     <dd><ul class="btn-list">
-        <li><a class="btn btn-large btn-danger delete_award" href="{% url badger.views.award_delete badge.slug award.id %}">{{ _('Delete award') }}</a></li>
+        <li><a class="btn btn-large btn-danger delete_award" href="{% url 'badger.views.award_delete' badge.slug award.id %}">{{ _('Delete award') }}</a></li>
     </ul></dd>
 </dl>
 {% endif %}
