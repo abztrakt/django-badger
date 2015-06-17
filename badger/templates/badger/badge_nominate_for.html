@@ -2,28 +2,35 @@
 
 {% block pageid %}badge_nominate{% endblock %}
 
+{% block pageJS %}
+    <script src="/static/js/jquery-ui-1.10.4.custom.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.autocomplete.js"></script>
+{% endblock %}
+
 {% block content %}
 
-<section class="row-fluid">
+<section class="row">
 
-    <section class="span4" id="detail">
+    <section class="col-md-4" id="detail">
         <header class="page-header">
             <h2>Badge: {{ badge_title }}</h2>
         </header>
         {% include "badger/includes/badge_full.html" %}
     </section>
 
-    <section class="span8">
+    <section class="col-md-8">
         <header class="page-header">
             <h2>{{ _("Submit badge nominations") }}</h2>
         </header>
 
         <form id="nominate_badge" method="POST" action="" enctype="multipart/form-data">
             {% csrf_token %}
+            <div class="ui-widget" name="combobox">
             <ul>
                 {{ form.as_ul }}
-                <li><input type="submit" class="btn btn-large btn-primary submit" value="{{ _("Submit nominations") }}"></li>
+                <li><input type="submit" class="btn btn-lg btn-primary submit" value="{{ _("Submit nominations") }}"></li>
             </ul>
+            </div>
         </form>
     </section>
 

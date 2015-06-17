@@ -3,7 +3,7 @@ import re
 import random
 import hashlib
 
-from datetime import datetime, timedelta, tzinfo
+import datetime
 from time import time, gmtime, strftime
 
 import os.path
@@ -106,7 +106,7 @@ DEFAULT_BADGE_IMAGE = getattr(settings, 'BADGER_DEFAULT_BADGE_IMAGE',
 DEFAULT_BADGE_IMAGE_URL = getattr(settings, 'BADGER_DEFAULT_BADGE_IMAGE_URL',
     urljoin(getattr(settings, 'MEDIA_URL', '/media/'), 'img/default-badge.png'))
 
-TIME_ZONE_OFFSET = getattr(settings, "TIME_ZONE_OFFSET", timedelta(0))
+TIME_ZONE_OFFSET = getattr(settings, "TIME_ZONE_OFFSET", datetime.timedelta(0))
 
 MK_UPLOAD_TMPL = '%(base)s/%(h1)s/%(h2)s/%(hash)s_%(field_fn)s_%(now)s_%(rand)04d.%(ext)s'
 
@@ -254,7 +254,7 @@ class SearchManagerMixin(object):
             and grouping quoted words together.
             Example:
             
-            >>> normalize_query('  some random  words "with   quotes  " and   spaces')
+            normalize_query('  some random  words "with   quotes  " and   spaces')
             ['some', 'random', 'words', 'with quotes', 'and', 'spaces']
         
         '''
@@ -555,10 +555,11 @@ class Badge(models.Model):
     def check_prerequisites(self, awardee):
         """Check the prerequisites for this badge. If they're all met, award
         this badge to the user."""
-        if self.is_awarded_to(awardee):
+        #this check is unnecessary and breaks nominating/awarding badges
+        #if self.is_awarded_to(awardee):
             # Not unique, but badge auto-award from prerequisites should only
             # happen once.
-            return False
+        #    return False
         for badge in self.prerequisites.all():
             if not badge.is_awarded_to(awardee):
                 # Bail on the first unmet prerequisites
@@ -968,7 +969,10 @@ class DeferredAwardManager(models.Manager):
     def _claim_qs(self, awardee, qs):
         """Claim all the deferred awards that match the queryset"""
         for da in qs:
-            da.claim(awardee)
+            """Only milestone badges(badge with more than one prerequisite)
+            may be added automatically. Others must be manually awarded."""
+            if(len(da.badge.prerequisites.all()) > 1):
+                da.claim(awardee)
 
 
 def make_random_code():

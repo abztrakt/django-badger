@@ -55,6 +55,13 @@ from labgeeks_people.models import UserProfile
 @login_required
 def home(request):
     """Badger home page"""
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     badge_list = Badge.objects.order_by('-modified').all()
     completed_prereqs =[]
     uncompleted_prereqs =[]
@@ -74,6 +81,13 @@ def home(request):
 
 @login_required
 def your_badges(request):
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     user = get_object_or_404(User, username=request.user.username)
     nominations= Nomination.objects.filter(nominee=user)
     created = Badge.objects.filter(creator=user)
@@ -84,9 +98,28 @@ def your_badges(request):
    
 
 @login_required
+def tag_list(request):
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
+    tags = Tag.objects.all().order_by('slug')
+    user = request.user;
+    return render_to_response('%s/tags_list.html' % bsettings.TEMPLATE_BASE, {'tag_list':tags, 'request':request}, context_instance=RequestContext(request))
+
+@login_required
 def badges_list(request, tag_name=None):
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     """Badges list page"""
-    
     award_list = None
     query_string = request.GET.get('q', None)
     if query_string is not None:
@@ -117,6 +150,13 @@ def badges_list(request, tag_name=None):
 @require_http_methods(['HEAD', 'GET', 'POST'])
 def detail(request, slug, format="html"):
     """Badge detail view"""
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     badge = get_object_or_404(Badge, slug=slug)
     if not badge.allows_detail_by(request.user):
         return HttpResponseForbidden('Detail forbidden')
@@ -179,6 +219,13 @@ def detail(request, slug, format="html"):
 @login_required
 def create(request):
     """Create a new badge"""
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     if not Badge.objects.allows_add_by(request.user):
         return HttpResponseForbidden()
 
@@ -194,20 +241,24 @@ def create(request):
             form.save_m2m()
             return HttpResponseRedirect(reverse(
                     'badger.views.detail', args=(new_sub.slug,)))
-
-    return render_to_response('%s/badge_create.html' % bsettings.TEMPLATE_BASE, dict(
-        form=form, request=request
-    ), context_instance=RequestContext(request))
+    return render_to_response('%s/badge_create.html' % bsettings.TEMPLATE_BASE, dict(form=form, request=request), context_instance=RequestContext(request))
 
 
 @require_http_methods(['GET', 'POST'])
 @login_required
 def edit(request, slug):
     """Edit an existing badge"""
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     badge = get_object_or_404(Badge, slug=slug)
+    badge.tags.all = badge.tags.all().order_by('slug')
     if not badge.allows_edit_by(request.user):
         return HttpResponseForbidden()
-    
     if request.method != "POST":
         form = BadgeEditForm(instance=badge)
     else:
@@ -219,22 +270,18 @@ def edit(request, slug):
             progresses=Progress.objects.filter(badge=badge)
             for prog in progresses:
                 if not badge.check_prerequisites(prog.user):
-                    prog.percent =0.0
+                    prog.percent = 0.0
                     count=badge.prerequisites.count()
                     for prereq in prog.badge.prerequisites.all():
                         if Award.objects.filter(badge=prereq, user=prog.user):
-                            prog.percent += 100.0/count
+                            prog.percent += 100.0 / count
                     prog.save()
                 else:
                     badge.award_to(prog.user)
                     prog.delete()
-  
             return HttpResponseRedirect(reverse(
                     'badger.views.detail', args=(new_sub.slug,)))
-
-    return render_to_response('%s/badge_edit.html' % bsettings.TEMPLATE_BASE, dict(
-        badge=badge, form=form, request=request
-    ), context_instance=RequestContext(request))
+    return render_to_response('%s/badge_edit.html' % bsettings.TEMPLATE_BASE, dict(badge=badge, form=form, request=request), context_instance=RequestContext(request))
 
 
 @require_http_methods(['GET', 'POST'])
@@ -242,6 +289,13 @@ def edit(request, slug):
 def delete(request, slug):
     """Delete a badge"""
     badge = get_object_or_404(Badge, slug=slug)
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     if not badge.allows_delete_by(request.user):
         return HttpResponseForbidden()
 
@@ -251,11 +305,11 @@ def delete(request, slug):
     if progress:
         progress=progress[0]
     user_award=Award.objects.filter(badge=badge, user=request.user)
- 
+
     prereqs=badge.prerequisites_for_user(request.user)
     completed_prereqs = prereqs['completed_prereqs']
     uncompleted_prereqs =prereqs['uncompleted_prereqs']
- 
+
     if request.method == "POST":
         messages.info(request, _('Badge "%s" deleted.') % badge.title)
         badge.delete()
@@ -273,17 +327,23 @@ def unretire(request, slug):
     if not badge.allows_delete_by(request.user):
         return HttpResponseForbidden()
 
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     awards_count = badge.award_set.count()
     prerequisites=badge.prerequisites.all()
     progress=Progress.objects.filter(user=request.user, badge=badge)
     if progress:
         progress=progress[0]
     user_award=Award.objects.filter(badge=badge, user=request.user)
- 
+
     prereqs=badge.prerequisites_for_user(request.user)
     completed_prereqs = prereqs['completed_prereqs']
     uncompleted_prereqs =prereqs['uncompleted_prereqs']
- 
+
     if request.method == "POST":
         messages.info(request, _('Badge "%s" retired.') % badge.title)
         badge.retired =False
@@ -301,16 +361,23 @@ def retire(request, slug):
     badge = get_object_or_404(Badge, slug=slug)
     if not badge.allows_delete_by(request.user):
         return HttpResponseForbidden()
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     progress=Progress.objects.filter(user=request.user, badge=badge)
     if progress:
         progress=progress[0]
     user_award=Award.objects.filter(badge=badge, user=request.user)
- 
+
     prerequisites=badge.prerequisites.all()
     prereqs=badge.prerequisites_for_user(request.user)
     completed_prereqs = prereqs['completed_prereqs']
     uncompleted_prereqs =prereqs['uncompleted_prereqs']
- 
+
     awards_count = badge.award_set.count()
 
     if request.method == "POST":
@@ -328,17 +395,24 @@ def retire(request, slug):
 @login_required
 def award_badge(request, slug):
     """Issue an award for a badge"""
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     badge = get_object_or_404(Badge, slug=slug)
     prerequisites=badge.prerequisites.all()
     progress=Progress.objects.filter(user=request.user, badge=badge)
     if progress:
         progress=progress[0]
     user_award=Award.objects.filter(badge=badge, user=request.user)
- 
+
     prereqs=badge.prerequisites_for_user(request.user)
     completed_prereqs = prereqs['completed_prereqs']
     uncompleted_prereqs =prereqs['uncompleted_prereqs']
- 
+
     if not badge.allows_award_to(request.user):
         return HttpResponseForbidden('Award forbidden')
 
@@ -362,7 +436,7 @@ def award_badge(request, slug):
             except BadgeRetiredException:
                 msg = "The badge "+badge.title +" has been retired"
                 return render_to_response('%s/fail.html' %bsettings.TEMPLATE_BASE, dict(request=request, message=msg), context_instance=RequestContext(request))
- 
+
             return HttpResponseRedirect(reverse('badger.views.detail', 
                                                 args=(badge.slug,)))
 
@@ -374,6 +448,13 @@ def award_badge(request, slug):
 @login_required
 @require_GET
 def awards_list(request, slug=None):
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     queryset = Award.objects
     if not slug:
         badge = None
@@ -396,6 +477,13 @@ def awards_list(request, slug=None):
 @require_http_methods(['HEAD', 'GET'])
 def award_detail(request, slug, id, format="html"):
     """Award detail view"""
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     badge = get_object_or_404(Badge, slug=slug)
     award = get_object_or_404(Award, badge=badge, pk=id)
     if not award.allows_detail_by(request.user):
@@ -425,6 +513,13 @@ def award_detail(request, slug, id, format="html"):
 @login_required
 def award_delete(request, slug, id):
     """Delete an award"""
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     badge = get_object_or_404(Badge, slug=slug)
     award = get_object_or_404(Award, badge=badge, pk=id)
     if not award.allows_delete_by(request.user):
@@ -434,11 +529,11 @@ def award_delete(request, slug, id):
     if progress:
         progress=progress[0]
     user_award=Award.objects.filter(badge=badge, user=request.user)
- 
+
     prereqs=badge.prerequisites_for_user(request.user)
     completed_prereqs = prereqs['completed_prereqs']
     uncompleted_prereqs =prereqs['uncompleted_prereqs']
- 
+
     if request.method == "POST":
         messages.info(request, _('Award for badge "%s" deleted.') %
                                badge.title)
@@ -454,6 +549,13 @@ def award_delete(request, slug, id):
 @login_required
 def _do_claim(request, deferred_award):
     """Perform claim of a deferred award"""
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     if not deferred_award.allows_claim_by(request.user):
         return HttpResponseForbidden('Claim denied')
     award = deferred_award.claim(request.user)
@@ -483,6 +585,13 @@ def _redirect_to_claimed_awards(awards, awards_ct):
 @require_http_methods(['GET', 'POST'])
 def claim_deferred_award(request, claim_code=None):
     """Deferred award detail view"""
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     if not claim_code:
         claim_code = request.REQUEST.get('code', '').strip()
 
@@ -536,6 +645,13 @@ def claim_deferred_award(request, claim_code=None):
 @require_http_methods(['GET', 'POST'])
 @login_required
 def claims_list(request, slug, claim_group, format="html"):
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     badge = get_object_or_404(Badge, slug=slug)
     if not badge.allows_manage_deferred_awards_by(request.user):
         return HttpResponseForbidden()
@@ -557,6 +673,13 @@ def claims_list(request, slug, claim_group, format="html"):
 @require_GET
 def awards_by_user(request, username):
     """Badge awards by user"""
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     user = get_object_or_404(User, username=username)
     awards = Award.objects.filter(user=user)
     return render_to_response('%s/awards_by_user.html' % bsettings.TEMPLATE_BASE, dict(
@@ -568,6 +691,13 @@ def awards_by_user(request, username):
 @require_GET
 def nominations_by_user(request, username):
     """Badge awards by user"""
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     user = get_object_or_404(User, username=username)
     nominations= Nomination.objects.filter(nominee=user)
     return render_to_response('%s/nominations_by_user.html' % bsettings.TEMPLATE_BASE, dict(
@@ -579,6 +709,13 @@ def nominations_by_user(request, username):
 @require_GET
 def awards_by_badge(request, slug):
     """Badge awards by badge"""
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     badge = get_object_or_404(Badge, slug=slug)
     awards = Award.objects.filter(badge=badge)
     return render_to_response('%s/awards_by_badge.html' % bsettings.TEMPLATE_BASE, dict(
@@ -593,6 +730,13 @@ def staff_tools(request):
     Will go away in the future, addressed by:
     https://github.com/lmorchard/django-badger/issues/35
     """
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     if not (request.user.is_staff or request.user.is_superuser):
         return HttpResponseForbidden()
 
@@ -622,6 +766,13 @@ def staff_tools(request):
 @require_GET
 def badges_by_user(request, username):
     """Badges created by user"""
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     user = get_object_or_404(User, username=username)
     badges = Badge.objects.filter(creator=user)
     return render_to_response('%s/badges_by_user.html' % bsettings.TEMPLATE_BASE, dict(
@@ -633,6 +784,13 @@ def badges_by_user(request, username):
 @login_required
 def nomination_detail(request, slug, id, format="html"):
     """Show details on a nomination, provide for approval and acceptance"""
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     badge = get_object_or_404(Badge, slug=slug)
     nomination = get_object_or_404(Nomination, badge=badge, pk=id)
     prerequisites=badge.prerequisites.all()
@@ -640,11 +798,11 @@ def nomination_detail(request, slug, id, format="html"):
     if progress:
         progress=progress[0]
     user_award=Award.objects.filter(badge=badge, user=request.user)
- 
+
     prereqs=badge.prerequisites_for_user(request.user)
     completed_prereqs = prereqs['completed_prereqs']
     uncompleted_prereqs =prereqs['uncompleted_prereqs']
- 
+
     if not nomination.allows_detail_by(request.user):
         return HttpResponseForbidden()
     if request.method == "POST":
@@ -669,6 +827,13 @@ def nomination_detail(request, slug, id, format="html"):
 @login_required
 def nominate_for(request, slug):
     """Submit nomination for a badge"""
+
+    params = {'request':request,}
+    if not request.user.has_perm('badger.view_badge'):
+        params['message'] = 'Permission Denied'
+        params['reason']  = 'You do not have permission to visit this part of the page.'
+        return render_to_response('fail.html', params)
+
     badge = get_object_or_404(Badge, slug=slug)
     if not badge.allows_nominate_for(request.user):
         return HttpResponseForbidden()
@@ -677,11 +842,11 @@ def nominate_for(request, slug):
     if progress:
         progress=progress[0]
     user_award=Award.objects.filter(badge=badge, user=request.user)
- 
+
     prereqs=badge.prerequisites_for_user(request.user)
     completed_prereqs = prereqs['completed_prereqs']
     uncompleted_prereqs =prereqs['uncompleted_prereqs']
- 
+
     if request.method != "POST":
         form = BadgeSubmitNominationForm()
     else:
@@ -690,7 +855,7 @@ def nominate_for(request, slug):
             try:
                 new_sub = form.save(commit=False)
                 if badge.nominations_autoapproved:
-                    award=Award(badge=badge,user=new_sub.nominee,creator=request.user) 
+                    award=Award(badge=badge,user=new_sub.nominee,creator=request.user)
                     award.save()
                 else:
                     new_sub.creator=request.user
@@ -700,7 +865,7 @@ def nominate_for(request, slug):
             except BadgeAlreadyAwardedException:
                 msg = "The badge "+badge.title +" has already been awarded to " + new_sub.nominee.username
                 return render_to_response('%s/fail.html' %bsettings.TEMPLATE_BASE, dict(request=request, message=msg), context_instance=RequestContext(request))
- 
+
             return HttpResponseRedirect(reverse('badger.views.detail',
                                                 args=(badge.slug,)))
 

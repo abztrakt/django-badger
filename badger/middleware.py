@@ -1,9 +1,12 @@
 import logging
 import time
-from datetime import datetime
 from django.conf import settings
 
-from .models import (Badge, Award)
+from .models import (Badge, Award, BadgePrerequisitesNotFullfilledException)
+from django.shortcuts import render_to_response
+from badger import settings as bsettings
+from django.template import RequestContext
+import datetime
 
 
 LAST_CHECK_COOKIE_NAME = getattr(settings,
@@ -21,7 +24,7 @@ class RecentBadgeAwardsList(object):
         # Try to fetch and parse the timestamp of the last award check, fall
         # back to None
         try:
-            self.last_check = datetime.fromtimestamp(float(
+            self.last_check = datetime.datetime.fromtimestamp(float(
                 self.request.COOKIES[LAST_CHECK_COOKIE_NAME]))
         except (KeyError, ValueError), e:
             self.last_check = None
@@ -73,3 +76,10 @@ class RecentBadgeAwardsMiddleware(object):
         if not hasattr(request, 'recent_badge_awards'):
             return response
         return request.recent_badge_awards.process_response(response)
+
+
+class CustomExceptionMiddleWare(object):
+    def process_exception(self, request, exception):
+        if isinstance(exception,BadgePrerequisitesNotFullfilledException):
+            msg = msg = "The badge does not have the prerequisites completed for user " + request.user.username
+            return render_to_response('%s/fail.html' %bsettings.TEMPLATE_BASE, dict(request=request, message=msg), context_instance=RequestContext(request))
